@@ -1,0 +1,2368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayPay ポイント運用シミュレーター(ver0.3)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script> <script src="https://cdn.jsdelivr.net/npm/date-fns"></script> <style>
+        /* --- 既存のスタイルはそのまま --- */
+        body {
+            font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 400px;
+            margin: 50px auto; /* 上下にマージンを追加 */
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            /* height: 85vh; */ /* 高さを固定しないように変更 */
+            min-height: 600px; /* 最小高さを設定 */
+            display: flex;
+            flex-direction: column;
+            border-radius: 10px; /* 角丸を追加 */
+        }
+        .header {
+            background: #4285F4;
+            color: white;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            border-top-left-radius: 10px; /* 角丸を追加 */
+            border-top-right-radius: 10px; /* 角丸を追加 */
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            flex-grow: 1;
+            text-align: center;
+        }
+        .back-button {
+            color: white;
+            font-size: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: absolute; /* 絶対位置指定 */
+            left: 15px; /* 左からの位置 */
+        }
+        .header-buttons { /* ヘッダー右側のボタン用コンテナ */
+            display: flex;
+            align-items: center;
+            position: absolute; /* 絶対位置指定 */
+            right: 15px; /* 右からの位置 */
+        }
+        .help-button, .close-button {
+            color: white;
+            font-size: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            margin-left: 10px; /* ボタン間のマージン */
+        }
+        .content {
+            padding: 15px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .screen {
+            display: none;
+            /* height: 100%; */ /* 高さを削除 */
+            flex-direction: column;
+            flex-grow: 1; /* コンテンツエリアが伸びるように */
+        }
+        .screen.active {
+            display: flex;
+        }
+        .course-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            cursor: pointer; /* クリック可能を示す */
+        }
+        .course-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0; /* アイコンが縮まないように */
+        }
+        .gold-icon { background-color: #E6B422; }
+        .standard-icon { background-color: #FF4B4B; } /* チャレンジコースの色を流用 */
+        .tech-icon { background-color: #007AFF; } /* テクノロジーっぽい色 */
+        .bitcoin-icon { background-color: #F7931A; } /* ビットコインの色 */
+
+        .challenge-icon { /* 旧チャレンジアイコン（screen2で使用）*/
+            background-color: #FF4B4B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .challenge-icon-inner {
+            width: 24px;
+            height: 24px;
+        }
+        .course-info {
+            flex-grow: 1;
+            margin-right: 10px; /* ポイント表示との間にマージン */
+        }
+        .course-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px; /* 少し小さく */
+        }
+        .course-date { /* screen1のコースカード内では非表示にするかも */
+            font-size: 12px;
+            color: #777;
+        }
+        .points-section { /* ポイント表示用のセクション */
+            text-align: right;
+            flex-shrink: 0; /* ポイント表示が縮まないように */
+            margin-right: 10px; /* 矢印との間にマージン */
+        }
+        .points {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .points-small {
+            font-size: 12px;
+            color: #777;
+        }
+        .change-positive {
+            color: #00A960;
+        }
+        .change-negative { /* マイナス表示用のスタイル追加 */
+            color: #FF4B4B;
+        }
+        .arrow-right { /* コースカード右端の矢印 */
+            font-size: 18px;
+            color: #ccc;
+            font-weight: bold;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            /* margin-bottom: 15px; */ /* 下マージンを削除または調整 */
+        }
+        .button {
+            padding: 12px;
+            border-radius: 5px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            flex-grow: 1;
+            font-size: 14px; /* ボタンの文字サイズ調整 */
+        }
+        .button:disabled { /* 無効化されたボタンのスタイル */
+            background-color: #e0e0e0;
+            color: #a0a0a0;
+            cursor: not-allowed;
+            border-color: #d0d0d0;
+        }
+        .button-blue {
+            background-color: #4285F4;
+            color: white;
+        }
+        .button-outline {
+            background-color: white;
+            color: #4285F4;
+            border: 1px solid #4285F4;
+        }
+        .button-gray {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .button-pink-text {
+            color: #ff4060 !important; /* ピンク色 */
+            border-color: #ff4060 !important; /* 枠線もピンク */
+        }
+        /* === 追加: 小さいボタン用のスタイル === */
+        .button-small {
+            padding: 6px 12px; /* パディングを小さく */
+            font-size: 12px;   /* 文字サイズを小さく */
+            flex-grow: 0;      /* コンテナ内で伸びないように */
+            margin-top: 10px;  /* 上の要素との間にマージン */
+            margin-bottom: 15px; /* 下の「追加する」ボタンとの間にマージン */
+            /* 必要であれば幅を指定 width: auto; または width: 80px; など */
+        }
+        /* === 追加: リセットボタンを右寄せにするためのコンテナ === */
+        .reset-button-container {
+            display: flex;
+            justify-content: flex-end; /* 右寄せ */
+        }
+        /* ==================================== */
+
+        .input-container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .input-container.highlighted {
+            border: 2px solid #FF0033;
+        }
+        .input-label {
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 5px;
+        }
+        .input-value {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: right;
+            border: none;
+            width: 100%;
+            outline: none;
+            /* スピナー非表示 */
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .input-value::-webkit-outer-spin-button,
+        .input-value::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .completion-message {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px; /* 少し大きく */
+            font-weight: bold;
+        }
+        .completion-points {
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .completion-button {
+            background-color: #00A960;
+            color: white;
+            border-radius: 20px;
+            padding: 5px 20px;
+            border: none;
+            margin: 0 auto;
+            display: block;
+            cursor: pointer;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px 15px; /* padding調整 */
+            cursor: pointer;
+            font-size: 14px; /* タブの文字サイズ調整 */
+        }
+        .tab.active {
+            border-bottom: 2px solid #4285F4;
+            color: #4285F4;
+            font-weight: bold; /* アクティブなタブを太字に */
+        }
+        .chart-container { /* グラフのコンテナ */
+            height: 180px; /* 高さを少し確保 */
+            margin-bottom: 10px; /* フィルターとのマージン調整 */
+            position: relative;
+            /* background-color: #FFFFFF; */ /* 背景は不要かも */
+            /* border: 1px solid #eee; */ /* 枠線も不要かも */
+            border-radius: 5px; /* 角丸を追加 */
+        }
+        .chart { /* canvas要素自体のスタイル */
+            width: 100%;
+            height: 100%;
+        }
+        /* === 追加: 期間フィルター用スタイル === */
+        .time-filters {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px; /* フィルターと説明の間のマージン */
+            padding: 5px 0;
+            border-radius: 5px;
+            background-color: #f0f0f0; /* 背景色 */
+        }
+        .time-filter {
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 3px;
+            background: none;
+            border: none;
+            color: #555;
+        }
+        .time-filter.active {
+            background-color: #4285F4; /* アクティブな背景色 */
+            color: white; /* アクティブな文字色 */
+            font-weight: bold;
+        }
+        /* ==================================== */
+        .confirmation-icons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            position: relative;
+        }
+        .from-icon, .to-icon { /* 共通スタイル */
+            width: 50px;
+            height: 50px;
+            background-color: #FF4B4B; /* チャレンジコースの色に合わせる */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .from-icon { /* PayPayアイコン（仮） */
+            border-radius: 10px;
+        }
+        .to-icon { /* コースアイコン */
+            border-radius: 50%;
+            margin-left: 30px;
+        }
+        .arrow {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #777; /* 矢印の色を変更 */
+            font-size: 24px;
+        }
+        .confirmation-data {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .confirmation-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px; /* 文字サイズ調整 */
+        }
+        .confirmation-row:last-child { /* 最後の行のマージン削除 */
+            margin-bottom: 0;
+        }
+        .confirmation-label {
+            color: #777;
+        }
+        .balance-container { /* screen1, screen2で使用 */
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 10px 15px; /* padding調整 */
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .balance-label {
+            font-size: 14px;
+            color: #555; /* 少し濃く */
+        }
+
+        /* --- ログイン画面用スタイル --- */
+        #loginScreen .header {
+             border-top-left-radius: 10px;
+             border-top-right-radius: 10px;
+             border-bottom-left-radius: 0;
+             border-bottom-right-radius: 0;
+        }
+         #loginScreen .header h1 {
+             text-align: center;
+             flex-grow: 1;
+         }
+        .login-container {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex-grow: 1;
+        }
+        .login-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .login-button {
+            padding: 15px;
+            border-radius: 5px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+            background-color: #4285F4;
+            color: white;
+            margin-top: 10px;
+        }
+        .login-error {
+            color: #FF4B4B;
+            font-size: 14px;
+            margin-top: 15px;
+            text-align: center;
+            min-height: 20px;
+        }
+        /* --- ここまでログイン画面用スタイル --- */
+
+        /* --- 追加スタイル --- */
+        .section-title { /* "全コース一覧"用 */
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            padding-left: 5px; /* 少しインデント */
+            border-left: 3px solid #4285F4; /* 左に青い線 */
+        }
+        .course-description { /* 詳細画面の説明文用 */
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+            background-color: #f9f9f9; /* 背景色 */
+            padding: 15px; /* 内側余白 */
+            border-radius: 5px; /* 角丸 */
+        }
+        /* --- 追加スタイルここまで --- */
+
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div id="loginScreen" class="screen active">
+            <div class="header">
+                <h1>ログイン</h1>
+            </div>
+            <div class="login-container">
+                <label for="username" style="display: block; margin-bottom: 5px; font-size: 14px; color: #555;">ユーザー名</label>
+                <input type="text" id="username" class="login-input" placeholder="ユーザー名">
+                <label for="password" style="display: block; margin-bottom: 5px; font-size: 14px; color: #555;">パスワード</label>
+                <input type="password" id="password" class="login-input" placeholder="パスワード">
+                <button id="loginButton" class="login-button">ログイン</button>
+                <div id="loginError" class="login-error"></div>
+            </div>
+        </div>
+
+        <div id="screen1" class="screen">
+            <div class="header">
+                <h1>ポイント運用</h1>
+                <div class="header-buttons">
+                    <button class="help-button">&#8413;</button>
+                    <button class="close-button">&#10005;</button>
+                </div>
+            </div>
+            <div class="content">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab(this, 'statusContent')">運用状況</div>
+                    <div class="tab" onclick="switchTab(this, 'historyContent')">運用履歴</div>
+                    <div class="tab" onclick="switchTab(this, 'addContent')">運用する</div>
+                    <div class="tab" onclick="switchTab(this, 'paypayLinkContent')">PayPayポイント運用</div>
+                </div>
+
+                <div id="statusContent" class="tab-content active">
+                    <div id="screen1Balance" class="balance-container">
+                        <div class="balance-label">運用可能資産</div>
+                        <div class="points">5000<span class="points-small">pt</span></div>
+                    </div>
+
+                    <div id="currentDateDisplay" style="background-color: #e3f2fd; border-radius: 5px; padding: 10px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1976d2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span style="color: #1976d2; font-weight: bold; font-size: 14px;">現在の運用日: <span id="currentDateText">2024年6月30日</span></span>
+                    </div>
+
+                    <!-- 投資状況サマリー -->
+                    <div id="investmentSummary" style="background: linear-gradient(135deg, #4285F4 0%, #6aa3ff 100%); color: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <h3 style="margin: 0 0 15px 0; font-size: 16px; font-weight: normal; opacity: 0.9;">運用状況サマリー</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
+                            <div>
+                                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 5px;">投資額</div>
+                                <div id="totalInvested" style="font-size: 20px; font-weight: bold;">0pt</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 5px;">評価額</div>
+                                <div id="totalValue" style="font-size: 20px; font-weight: bold;">0pt</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 12px; opacity: 0.8; margin-bottom: 5px;">累計損益</div>
+                                <div id="totalProfit" style="font-size: 20px; font-weight: bold;">0pt</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-title">全コース一覧</div>
+
+                    <div class="course-card" onclick="showCourseDetail('gold')">
+                        <div class="course-icon gold-icon">金</div>
+                        <div class="course-info">
+                            <div class="course-name">金（ゴールド）コース</div>
+                            </div>
+                        <div class="points-section">
+                            <div class="points">0<span class="points-small">pt</span></div>
+                            <div class="points change-positive">0<span class="points-small">pt</span></div>
+                            <div class="points-small change-positive">(0%)</div>
+                        </div>
+                        <span class="arrow-right">&gt;</span>
+                    </div>
+
+                    <div class="course-card" onclick="showCourseDetail('standard')">
+                        <div class="course-icon standard-icon">ス</div>
+                        <div class="course-info">
+                            <div class="course-name">スタンダードコース</div>
+                        </div>
+                        <div class="points-section">
+                            <div class="points">0<span class="points-small">pt</span></div>
+                            <div class="points change-positive">0<span class="points-small">pt</span></div>
+                            <div class="points-small change-positive">(0%)</div>
+                        </div>
+                        <span class="arrow-right">&gt;</span>
+                    </div>
+
+                    <div class="course-card" onclick="showCourseDetail('tech')">
+                        <div class="course-icon tech-icon">テ</div>
+                        <div class="course-info">
+                            <div class="course-name">テクノロジーコース</div>
+                        </div>
+                        <div class="points-section">
+                            <div class="points">0<span class="points-small">pt</span></div>
+                            <div class="points change-positive">0<span class="points-small">pt</span></div>
+                            <div class="points-small change-positive">(0%)</div>
+                        </div>
+                        <span class="arrow-right">&gt;</span>
+                    </div>
+
+                    <div class="course-card" onclick="showCourseDetail('bitcoin')">
+                        <div class="course-icon bitcoin-icon">ビ</div>
+                        <div class="course-info">
+                            <div class="course-name">ビットコインコース</div>
+                        </div>
+                        <div class="points-section">
+                            <div class="points">0<span class="points-small">pt</span></div>
+                            <div class="points change-positive">0<span class="points-small">pt</span></div>
+                            <div class="points-small change-positive">(0%)</div>
+                        </div>
+                        <span class="arrow-right">&gt;</span>
+                    </div>
+                </div>
+
+                <div id="historyContent" class="tab-content" style="display: none;">
+                    <div style="padding: 15px 0;">
+                        <div id="historyList" style="max-height: 400px; overflow-y: auto;">
+                            <!-- 履歴項目がここに追加される -->
+                        </div>
+                        <div id="emptyHistory" style="padding: 40px; text-align: center; color: #777;">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 10px;">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            <p>まだ取引履歴がありません</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="addContent" class="tab-content" style="display: none; padding: 20px;">
+                    <h3 style="color: #333; margin-bottom: 20px;">時間を進めて運用</h3>
+                    <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; margin-bottom: 20px;">
+                        <p style="color: #856404; margin: 0; font-size: 14px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#856404" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            現在: <strong id="currentDateInOperation">2024年6月30日</strong><br>
+                            最大で<strong id="maxDateInOperation">2025年6月30日</strong>まで運用可能です
+                        </p>
+                    </div>
+                    
+                    <div id="advanceTimeButtons" style="display: flex; flex-direction: column; gap: 15px;">
+                        <button class="button advance-time-btn" data-months="1" style="background: #9E9E9E; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                            1ヶ月運用する
+                        </button>
+                        <button class="button advance-time-btn" data-months="3" style="background: #607D8B; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                            3ヶ月運用する
+                        </button>
+                        <button class="button advance-time-btn" data-months="6" style="background: #4CAF50; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                            6ヶ月運用する
+                        </button>
+                        <button class="button advance-time-btn" data-months="12" style="background: #2196F3; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                            1年運用する
+                        </button>
+                    </div>
+                    
+                    <div id="operationResult" style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px; display: none;">
+                        <h4 style="color: #333; margin-bottom: 15px;">運用結果</h4>
+                        <div id="operationDetails" style="color: #555;"></div>
+                    </div>
+                </div>
+
+                <div id="paypayLinkContent" class="tab-content" style="display: none; padding-top: 20px; text-align: center;">
+                    <h4>PayPayポイント運用のご紹介</h4>
+                    <p style="font-size: 14px; color: #555; line-height: 1.6;">
+                        このシミュレーターでポイント運用の楽しさを体験したら、次は本物の「PayPayポイント運用」を始めてみませんか？<br>
+                        PayPayアプリからかんたんに始められます。
+                    </p>
+                    <div style="margin: 20px 0;">
+                        <img id="ppPointQR" src="" alt="PayPayポイント運用 QRコード" style="width: 150px; height: 150px; border: 1px solid #ddd; padding: 5px;">
+                    </div>
+                    <p style="font-size: 12px; color: #777;">↑ PayPayアプリで読み取ってください</p>
+                    <a href="http://paypay.ne.jp/point-operation1/" target="_blank" class="button button-outline" style="text-decoration: none; display: inline-block; width: auto; padding: 10px 20px; margin-top: 10px;">
+                        PayPayポイント運用の詳細を見る
+                    </a>
+                </div>
+
+                </div>
+        </div>
+
+        <div id="goldDetailScreen" class="screen">
+             <div class="header">
+                <button class="back-button" onclick="showScreen('screen1')">&#10094;</button>
+                <h1>金（ゴールド）コース</h1>
+                <div class="header-buttons">
+                    <button class="help-button">&#8413;</button>
+                    <button class="close-button">&#10005;</button>
+                </div>
+            </div>
+            <div class="content">
+                <div class="chart-container">
+                    <canvas id="goldChart" class="chart"></canvas>
+                </div>
+                <div class="time-filters" data-course="gold">
+                    <button class="time-filter" data-period="1M">1ヶ月</button>
+                    <button class="time-filter" data-period="3M">3ヶ月</button>
+                    <button class="time-filter" data-period="6M">6ヶ月</button>
+                    <button class="time-filter active" data-period="1Y">1年</button>
+                    <button class="time-filter" data-period="5Y">5年</button>
+                </div>
+                
+                <!-- 保有状況セクション -->
+                <div id="goldHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h4 style="margin: 0; font-size: 14px; color: #666;">保有状況</h4>
+                        <span id="goldCurrentPrice" style="font-size: 12px; color: #999;">現在価格: 10,000pt</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">投資額</div>
+                            <div id="goldInvested" style="font-size: 16px; font-weight: bold; color: #333;">0pt</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">評価額</div>
+                            <div id="goldValue" style="font-size: 16px; font-weight: bold; color: #333;">0pt</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">累計損益</div>
+                            <div id="goldProfit" style="font-size: 16px; font-weight: bold;">0pt</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-description">
+                    <p><strong>連動するETF:</strong> SPDR®︎ゴールド・シェア（GLD）</p>
+                    <p><strong>コース概要:</strong> 金の価格に連動することを目指すコースです。金は一般的に、株式市場が不安定な時に「安全資産」として買われる傾向があります。ただし、金価格も様々な要因で変動するため、元本が保証されているわけではありません。</p>
+                    <p><strong>特徴:</strong> 他のコースと比較して、値動きが比較的穏やかとされていますが、世界経済や金融情勢の影響を受けます。</p>
+                </div>
+                 <div class="button-container">
+                    <button class="button button-blue add-points-button">ポイントを追加する</button>
+                    <button class="button button-outline button-pink-text">引き出す（交換）</button>
+                 </div>
+            </div>
+        </div>
+
+        <div id="standardDetailScreen" class="screen">
+             <div class="header">
+                <button class="back-button" onclick="showScreen('screen1')">&#10094;</button>
+                <h1>スタンダードコース</h1>
+                <div class="header-buttons">
+                    <button class="help-button">&#8413;</button>
+                    <button class="close-button">&#10005;</button>
+                </div>
+            </div>
+            <div class="content">
+                 <div class="chart-container">
+                     <canvas id="standardChart" class="chart"></canvas>
+                 </div>
+                 <div class="time-filters" data-course="standard">
+                     <button class="time-filter" data-period="1M">1ヶ月</button>
+                     <button class="time-filter" data-period="3M">3ヶ月</button>
+                     <button class="time-filter" data-period="6M">6ヶ月</button>
+                     <button class="time-filter active" data-period="1Y">1年</button>
+                     <button class="time-filter" data-period="5Y">5年</button>
+                 </div>
+                
+                <!-- 保有状況セクション -->
+                <div id="standardHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h4 style="margin: 0; font-size: 14px; color: #666;">保有状況</h4>
+                        <span id="standardCurrentPrice" style="font-size: 12px; color: #999;">現在価格: 10,000pt</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">投資額</div>
+                            <div id="standardInvested" style="font-size: 16px; font-weight: bold; color: #333;">0pt</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">評価額</div>
+                            <div id="standardValue" style="font-size: 16px; font-weight: bold; color: #333;">0pt</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">累計損益</div>
+                            <div id="standardProfit" style="font-size: 16px; font-weight: bold;">0pt</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-description">
+                    <p><strong>連動するETF:</strong> DIREXION S&P 500 3X（SPXL）</p>
+                    <p><strong>コース概要:</strong> アメリカの代表的な株価指数であるS&P500指数の一日の値動きの「3倍」の値動きを目指すコースです。大きなリターンが期待できる一方、相場が下がった場合には損失も大きくなる可能性があります。</p>
+                    <p><strong>特徴:</strong> ハイリスク・ハイリターンのコースです。市場の変動を積極的に捉えたい方向けですが、大きな価格変動リスクを伴います。</p>
+                </div>
+                 <div class="button-container">
+                    <button class="button button-blue add-points-button">ポイントを追加する</button>
+                     <button class="button button-outline button-pink-text">引き出す（交換）</button>
+                 </div>
+            </div>
+        </div>
+
+        <div id="techDetailScreen" class="screen">
+             <div class="header">
+                <button class="back-button" onclick="showScreen('screen1')">&#10094;</button>
+                <h1>テクノロジーコース</h1>
+                <div class="header-buttons">
+                    <button class="help-button">&#8413;</button>
+                    <button class="close-button">&#10005;</button>
+                </div>
+            </div>
+            <div class="content">
+                 <div class="chart-container">
+                    <canvas id="techChart" class="chart"></canvas>
+                 </div>
+                 <div class="time-filters" data-course="tech">
+                     <button class="time-filter" data-period="1M">1ヶ月</button>
+                     <button class="time-filter" data-period="3M">3ヶ月</button>
+                     <button class="time-filter" data-period="6M">6ヶ月</button>
+                     <button class="time-filter active" data-period="1Y">1年</button>
+                     <button class="time-filter" data-period="5Y">5年</button>
+                 </div>
+                
+                <!-- 保有状況セクション -->
+                <div id="techHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h4 style="margin: 0; font-size: 14px; color: #666;">保有状況</h4>
+                        <span id="techCurrentPrice" style="font-size: 12px; color: #999;">現在価格: 10,000pt</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">投資額</div>
+                            <div id="techInvested" style="font-size: 16px; font-weight: bold; color: #333;">0pt</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">評価額</div>
+                            <div id="techValue" style="font-size: 16px; font-weight: bold; color: #333;">0pt</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">累計損益</div>
+                            <div id="techProfit" style="font-size: 16px; font-weight: bold;">0pt</div>
+                        </div>
+                    </div>
+                </div>
+                
+                 <div class="course-description">
+                    <p><strong>連動するETF:</strong> DIREXION NASDAQ-100 3X（TQQQ）</p>
+                    <p><strong>コース概要:</strong> アメリカのナスダック100指数の一日の値動きの「3倍」の値動きを目指すコースです。ナスダック100はハイテク関連企業の比率が高い指数であり、その3倍の値動きを目指すため、非常に大きなリターンが期待できる一方、下落時のリスクも極めて大きくなります。</p>
+                    <p><strong>特徴:</strong> スタンダードコース以上にハイリスク・ハイリターンなコースです。テクノロジー株の成長に期待する方向けですが、非常に高い価格変動リスクを許容する必要があります。</p>
+                </div>
+                 <div class="button-container">
+                    <button class="button button-blue add-points-button">ポイントを追加する</button>
+                    <button class="button button-outline button-pink-text">引き出す（交換）</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="bitcoinDetailScreen" class="screen">
+             <div class="header">
+                <button class="back-button" onclick="showScreen('screen1')">&#10094;</button>
+                <h1>ビットコインコース</h1>
+                 <div class="header-buttons">
+                    <button class="help-button">&#8413;</button>
+                    <button class="close-button">&#10005;</button>
+                </div>
+            </div>
+            <div class="content">
+                 <div class="chart-container">
+                    <canvas id="bitcoinChart" class="chart"></canvas>
+                 </div>
+                 <div class="time-filters" data-course="bitcoin">
+                     <button class="time-filter" data-period="1M">1ヶ月</button>
+                     <button class="time-filter" data-period="3M">3ヶ月</button>
+                     <button class="time-filter" data-period="6M">6ヶ月</button>
+                     <button class="time-filter active" data-period="1Y">1年</button>
+                     <button class="time-filter" data-period="5Y">5年</button>
+                 </div>
+                
+                <!-- 保有状況セクション -->
+                <div id="bitcoinHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h4 style="margin: 0; font-size: 14px; color: #666;">保有状況</h4>
+                        <span id="bitcoinCurrentPrice" style="font-size: 12px; color: #999;">現在価格: 10,000pt</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center;">
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">投資額</div>
+                            <div id="bitcoinInvested" style="font-size: 16px; font-weight: bold; color: #333;">0pt</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">評価額</div>
+                            <div id="bitcoinValue" style="font-size: 16px; font-weight: bold; color: #333;">0pt</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: #777; margin-bottom: 3px;">累計損益</div>
+                            <div id="bitcoinProfit" style="font-size: 16px; font-weight: bold;">0pt</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="course-description">
+                    <p><strong>連動対象（想定）:</strong> ビットコイン価格</p>
+                    <p><strong>コース概要:</strong> 代表的な暗号資産（仮想通貨）であるビットコインの価格変動に連動することを目指すコースです（※このコースはシミュレーター上の架空のものです）。ビットコインは価格変動が非常に大きいことで知られています。</p>
+                    <p><strong>特徴:</strong> 極めてハイリスク・ハイリターンなコースです。短期間で大きな利益を得る可能性がある一方、急激な価格下落により大きな損失を被る可能性も非常に高いです。暗号資産市場の動向に大きく左右されます。</p>
+                </div>
+                <div class="button-container">
+                    <button class="button button-blue add-points-button">ポイントを追加する</button>
+                    <button class="button button-outline button-pink-text">引き出す（交換）</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen2" class="screen">
+            <div class="header">
+                <button id="backToDetailFromAdd" class="back-button">&#10094;</button>
+                <h1>ポイント追加</h1>
+                <div class="header-buttons">
+                    <button class="help-button">&#8413;</button>
+                    <button class="close-button">&#10005;</button>
+                </div>
+            </div>
+            <div class="content">
+                <div id="screen2Balance" class="balance-container">
+                    <div class="balance-label">運用可能資産</div>
+                    <div class="points">5000<span class="points-small">pt</span></div>
+                </div>
+
+                <div class="course-card">
+                    <div id="addPointsCourseIcon" class="course-icon standard-icon">ス</div>
+                    <div class="course-info">
+                        <div id="addPointsCourseName" class="course-name">スタンダードコース</div>
+                    </div>
+                    <div class="points-section">
+                        <div class="points">0<span class="points-small">pt</span></div>
+                    </div>
+                </div>
+
+                <div class="input-container highlighted">
+                    <div class="input-label">追加ポイント数</div>
+                    <input id="pointsInput" type="number" pattern="\d*" class="input-value" value="0" onfocus="this.select()" oninput="validateAddButton()">
+                    <div class="input-label" style="text-align: right; margin-top: 5px;">pt</div>
+                </div>
+
+                <div class="button-container">
+                    <button id="add100Button" class="button button-outline">＋100</button>
+                    <button id="add500Button" class="button button-outline">＋500</button>
+                    <button id="add1000Button" class="button button-outline">＋1,000</button>
+                    <button id="addAllButton" class="button button-outline">全額追加</button>
+                </div>
+
+                <div class="reset-button-container">
+                    <button id="resetAddPointsButton" class="button button-gray button-small">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <polyline points="1 20 1 14 7 14"></polyline>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                        リセット
+                    </button>
+                </div>
+                <button id="addButton" class="button button-blue" disabled>追加する</button>
+            </div> </div> <div id="screen3" class="screen">
+             <div class="header">
+                <button id="backToScreen2" class="back-button" onclick="showScreen('screen2')">&#10094;</button> <h1>ポイント追加</h1>
+                 <div class="header-buttons">
+                    <button class="close-button">&#10005;</button>
+                </div>
+            </div>
+            <div class="content">
+                <div style="text-align: center; margin-bottom: 20px; font-size: 16px;">追加内容を確認してください</div>
+                <div class="confirmation-icons">
+                    <div class="from-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1.33789 12.378C1.33789 6.858 5.81789 2.378 11.3379 2.378C16.8579 2.378 21.3379 6.858 21.3379 12.378C21.3379 17.898 16.8579 22.378 11.3379 22.378C5.81789 22.378 1.33789 17.898 1.33789 12.378Z" fill="#FF4B4B"/>
+                        <path d="M11.3379 17.378L15.3379 12.378L11.3379 7.37799" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7.33789 12.378H15.3379" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div id="confirmCourseIcon" class="to-icon standard-icon">
+                         <div style="color: white; font-weight: bold;">ス</div>
+                    </div>
+                </div>
+                <div class="confirmation-data">
+                    <div class="confirmation-row">
+                        <div class="confirmation-label">利用コース</div>
+                        <div id="confirmCourseName">スタンダードコース</div>
+                    </div>
+                    <div class="confirmation-row">
+                        <div class="confirmation-label">追加ポイント数</div>
+                        <div class="points"><span id="confirmPoints">0</span><span class="points-small">pt</span></div> </div>
+                </div>
+                <div class="button-container" style="margin-top: auto;">
+                    <button class="button button-outline" onclick="showScreen('screen2')">キャンセル</button>
+                    <button id="confirmButton" class="button button-blue">追加する</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="screen4" class="screen">
+            <div class="header">
+                <h1>ポイント追加完了</h1>
+                 <div class="header-buttons">
+                    <button class="close-button">&#10005;</button>
+                 </div>
+            </div>
+            <div class="content" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div id="completeCourseIcon" class="course-icon standard-icon" style="margin: 20px auto; width: 60px; height: 60px; font-size: 24px; display: flex; align-items: center; justify-content: center;">
+                        ス
+                    </div>
+                    <div class="completion-message">
+                        <span id="completeCourseName">スタンダードコース</span>への<br>追加が完了しました
+                    </div>
+                    <div style="text-align: center; font-size: 12px; color: #777; margin-bottom: 10px;">
+                        <span id="completionTime"></span>
+                    </div>
+                    <div class="completion-points">
+                        <span id="completionPoints">0</span><span style="font-size: 18px;">pt</span> </div>
+
+                    <div class="confirmation-data" style="margin-top: 20px;">
+                        <div class="confirmation-row">
+                            <div class="confirmation-label">利用コース</div>
+                            <div id="completeDetailCourseName">スタンダードコース</div>
+                        </div>
+                        <div class="confirmation-row">
+                            <div class="confirmation-label">追加ポイント数</div>
+                            <div class="points"><span id="completionDetailPoints">0</span><span class="points-small">pt</span></div> </div>
+                         <div class="confirmation-row">
+                            <div class="confirmation-label">予想損益（1年）</div>
+                            <div>+10pt</div> </div>
+                    </div>
+                    </div>
+
+                 <div style="margin-top: 15px;">
+                    <button id="returnButton" class="button button-outline">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                           <line x1="3" y1="12" x2="21" y2="12"></line>
+                           <line x1="3" y1="6" x2="21" y2="6"></line>
+                           <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                        運用状況に戻る
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 引き出し画面 -->
+        <div id="withdrawScreen" class="screen">
+            <div class="header">
+                <button id="backToDetailFromWithdraw" class="back-button">&#10094;</button>
+                <h1>ポイント引き出し</h1>
+                <div class="header-buttons">
+                    <button class="help-button">&#8413;</button>
+                    <button class="close-button">&#10005;</button>
+                </div>
+            </div>
+            <div class="content">
+                <div id="withdrawBalance" class="balance-container">
+                    <div class="balance-label">運用可能資産</div>
+                    <div class="points">5000<span class="points-small">pt</span></div>
+                </div>
+
+                <div class="course-card">
+                    <div id="withdrawCourseIcon" class="course-icon standard-icon">ス</div>
+                    <div class="course-info">
+                        <div id="withdrawCourseName" class="course-name">スタンダードコース</div>
+                    </div>
+                    <div class="points-section">
+                        <div id="withdrawCurrentPoints" class="points">0<span class="points-small">pt</span></div>
+                    </div>
+                </div>
+
+                <div class="input-container highlighted">
+                    <div class="input-label">引き出しポイント数</div>
+                    <input id="withdrawPointsInput" type="number" pattern="\d*" class="input-value" value="0" onfocus="this.select()" oninput="validateWithdrawButton()">
+                    <div class="input-label" style="text-align: right; margin-top: 5px;">pt</div>
+                </div>
+
+                <div class="button-container">
+                    <button id="withdraw100Button" class="button button-outline">−100</button>
+                    <button id="withdraw500Button" class="button button-outline">−500</button>
+                    <button id="withdraw1000Button" class="button button-outline">−1,000</button>
+                    <button id="withdrawAllButton" class="button button-outline">全額引き出し</button>
+                </div>
+
+                <div class="reset-button-container">
+                    <button id="resetWithdrawButton" class="button button-gray button-small">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 4px;">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <polyline points="1 20 1 14 7 14"></polyline>
+                            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                        </svg>
+                        リセット
+                    </button>
+                </div>
+                <button id="withdrawButton" class="button button-outline button-pink-text" disabled>引き出す</button>
+            </div>
+        </div>
+
+        <!-- 引き出し確認画面 -->
+        <div id="withdrawConfirmScreen" class="screen">
+            <div class="header">
+                <button class="back-button" onclick="showScreen('withdrawScreen')">&#10094;</button>
+                <h1>ポイント引き出し</h1>
+                <div class="header-buttons">
+                    <button class="close-button">&#10005;</button>
+                </div>
+            </div>
+            <div class="content">
+                <div style="text-align: center; margin-bottom: 20px; font-size: 16px;">引き出し内容を確認してください</div>
+                <div class="confirmation-icons">
+                    <div id="withdrawConfirmCourseIcon" class="from-icon standard-icon">
+                        <div style="color: white; font-weight: bold;">ス</div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="to-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1.33789 12.378C1.33789 6.858 5.81789 2.378 11.3379 2.378C16.8579 2.378 21.3379 6.858 21.3379 12.378C21.3379 17.898 16.8579 22.378 11.3379 22.378C5.81789 22.378 1.33789 17.898 1.33789 12.378Z" fill="#FF4B4B"/>
+                        <path d="M11.3379 17.378L15.3379 12.378L11.3379 7.37799" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7.33789 12.378H15.3379" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="confirmation-data">
+                    <div class="confirmation-row">
+                        <div class="confirmation-label">利用コース</div>
+                        <div id="withdrawConfirmCourseName">スタンダードコース</div>
+                    </div>
+                    <div class="confirmation-row">
+                        <div class="confirmation-label">引き出しポイント数</div>
+                        <div class="points"><span id="withdrawConfirmPoints">0</span><span class="points-small">pt</span></div>
+                    </div>
+                </div>
+                <div class="button-container" style="margin-top: auto;">
+                    <button class="button button-outline" onclick="showScreen('withdrawScreen')">キャンセル</button>
+                    <button id="withdrawConfirmButton" class="button button-outline button-pink-text">引き出す</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 引き出し完了画面 -->
+        <div id="withdrawCompleteScreen" class="screen">
+            <div class="header">
+                <h1>ポイント引き出し完了</h1>
+                <div class="header-buttons">
+                    <button class="close-button">&#10005;</button>
+                </div>
+            </div>
+            <div class="content" style="display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div id="withdrawCompleteCourseIcon" class="course-icon standard-icon" style="margin: 20px auto; width: 60px; height: 60px; font-size: 24px; display: flex; align-items: center; justify-content: center;">
+                        ス
+                    </div>
+                    <div class="completion-message">
+                        <span id="withdrawCompleteCourseName">スタンダードコース</span>からの<br>引き出しが完了しました
+                    </div>
+                    <div style="text-align: center; font-size: 12px; color: #777; margin-bottom: 10px;">
+                        <span id="withdrawCompletionTime"></span>
+                    </div>
+                    <div class="completion-points">
+                        <span id="withdrawCompletionPoints">0</span><span style="font-size: 18px;">pt</span>
+                    </div>
+
+                    <div class="confirmation-data" style="margin-top: 20px;">
+                        <div class="confirmation-row">
+                            <div class="confirmation-label">利用コース</div>
+                            <div id="withdrawCompleteDetailCourseName">スタンダードコース</div>
+                        </div>
+                        <div class="confirmation-row">
+                            <div class="confirmation-label">引き出しポイント数</div>
+                            <div class="points"><span id="withdrawCompletionDetailPoints">0</span><span class="points-small">pt</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <button id="withdrawReturnButton" class="button button-outline">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 5px;">
+                           <line x1="3" y1="12" x2="21" y2="12"></line>
+                           <line x1="3" y1="6" x2="21" y2="6"></line>
+                           <line x1="3" y1="18" x2="21" y2="18"></line>
+                        </svg>
+                        運用状況に戻る
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        </div>
+        <script>
+        let currentCourseId = null; // ポイント追加/引き出し対象のコースID
+        let availablePoints = 5000; // 運用可能資産 (グローバル変数として保持)
+        let userHoldings = {}; // ユーザーのコース保有状況 { courseId: { invested: number, units: number }, ... }
+        let allCourseData = {}; // 全コースのダミーデータ { courseId: [{date: Date, value: number}, ...] }
+        let chartInstances = {}; // 各チャートのインスタンス { courseId: ChartInstance }
+        let loginDate = new Date('2024-06-30'); // ログインした日時を保持（2024年6月30日に固定）
+        let currentDate = new Date('2024-06-30'); // 現在のシミュレーション日付
+        let transactionHistory = []; // 取引履歴 [{date: Date, type: 'add'|'withdraw', courseId: string, points: number}, ...]
+
+        // --- ここに手動で取得したデータを貼り付け ---
+        // 例:
+        // const embeddedData = {
+        //   gold: [ { date: '2019-07-01', value: 14000 }, { date: '2019-07-02', value: 14020 }, ... ],
+        //   standard: [ { date: '2019-07-01', value: 8000 }, { date: '2019-07-02', value: 8050 }, ... ],
+        //   tech: [ { date: '2019-07-01', value: 12000 }, { date: '2019-07-02', value: 12100 }, ... ],
+        //   bitcoin: [ { date: '2019-07-01', value: 1000000 }, { date: '2019-07-02', value: 1020000 }, ... ]
+        // };
+        // 埋め込みデータを空にして、ダミーデータ生成機能を使用
+        const embeddedData = {};
+
+
+        // --- DOM要素取得 ---
+        const pointsInput = document.getElementById('pointsInput');
+        const screen1BalanceDisplay = document.querySelector('#screen1Balance .points');
+        const screen2BalanceDisplay = document.querySelector('#screen2Balance .points');
+        const addPointsCourseIcon = document.getElementById('addPointsCourseIcon');
+        const addPointsCourseName = document.getElementById('addPointsCourseName');
+        const confirmPointsDisplay = document.getElementById('confirmPoints');
+        const confirmCourseIcon = document.getElementById('confirmCourseIcon');
+        const confirmCourseName = document.getElementById('confirmCourseName');
+        const completionPointsDisplay = document.getElementById('completionPoints');
+        const completionDetailPoints = document.getElementById('completionDetailPoints');
+        const completionTimeDisplay = document.getElementById('completionTime');
+        const completeCourseIcon = document.getElementById('completeCourseIcon');
+        const completeCourseName = document.getElementById('completeCourseName');
+        const completeDetailCourseName = document.getElementById('completeDetailCourseName');
+        const add100Button = document.getElementById('add100Button');
+        const add500Button = document.getElementById('add500Button');
+        const add1000Button = document.getElementById('add1000Button');
+        const addAllButton = document.getElementById('addAllButton');
+        const addButton = document.getElementById('addButton'); // Screen2 の「追加する」ボタン
+        const resetAddPointsButton = document.getElementById('resetAddPointsButton'); // === 追加: リセットボタン ===
+        const ppPointQR = document.getElementById('ppPointQR');
+
+        // 引き出し関連のDOM要素
+        const withdrawPointsInput = document.getElementById('withdrawPointsInput');
+        const withdrawBalanceDisplay = document.querySelector('#withdrawBalance .points');
+        const withdrawCourseIcon = document.getElementById('withdrawCourseIcon');
+        const withdrawCourseName = document.getElementById('withdrawCourseName');
+        const withdrawCurrentPoints = document.getElementById('withdrawCurrentPoints');
+        const withdraw100Button = document.getElementById('withdraw100Button');
+        const withdraw500Button = document.getElementById('withdraw500Button');
+        const withdraw1000Button = document.getElementById('withdraw1000Button');
+        const withdrawAllButton = document.getElementById('withdrawAllButton');
+        const withdrawButton = document.getElementById('withdrawButton');
+        const resetWithdrawButton = document.getElementById('resetWithdrawButton');
+        const withdrawConfirmPoints = document.getElementById('withdrawConfirmPoints');
+        const withdrawConfirmCourseIcon = document.getElementById('withdrawConfirmCourseIcon');
+        const withdrawConfirmCourseName = document.getElementById('withdrawConfirmCourseName');
+        const withdrawCompletionPoints = document.getElementById('withdrawCompletionPoints');
+        const withdrawCompletionDetailPoints = document.getElementById('withdrawCompletionDetailPoints');
+        const withdrawCompletionTime = document.getElementById('withdrawCompletionTime');
+        const withdrawCompleteCourseIcon = document.getElementById('withdrawCompleteCourseIcon');
+        const withdrawCompleteCourseName = document.getElementById('withdrawCompleteCourseName');
+        const withdrawCompleteDetailCourseName = document.getElementById('withdrawCompleteDetailCourseName');
+
+        // コース情報のマッピング
+        const courseDetails = {
+            gold: { name: '金（ゴールド）コース', iconClass: 'gold-icon', iconText: '金', color: '#E6B422', volatility: 0.005, trend: 0.0001 },
+            standard: { name: 'スタンダードコース', iconClass: 'standard-icon', iconText: 'ス', color: '#FF4B4B', volatility: 0.015, trend: 0.0005 },
+            tech: { name: 'テクノロジーコース', iconClass: 'tech-icon', iconText: 'テ', color: '#007AFF', volatility: 0.025, trend: 0.0008 },
+            bitcoin: { name: 'ビットコインコース', iconClass: 'bitcoin-icon', iconText: 'ビ', color: '#F7931A', volatility: 0.05, trend: 0.001 }
+        };
+
+        // --- ダミーデータ生成関数 ---
+        function generateDummyData(courseId, years = 6, initialValue = 10000) {
+            try {
+                console.log(`generateDummyData: courseId=${courseId}, years=${years}, initialValue=${initialValue}`);
+                const data = [];
+                let currentDateTemp = new Date(loginDate);
+                currentDateTemp.setFullYear(loginDate.getFullYear() - years + 1); // 5年前から1年後まで
+                currentDateTemp.setHours(0, 0, 0, 0); // 日付の比較のため時間をリセット
+
+                let currentValue = initialValue;
+                const courseInfo = courseDetails[courseId];
+                const volatility = courseInfo.volatility; // 日々の変動率の大きさ
+                const trend = courseInfo.trend; // 全体的な上昇/下降トレンド
+
+                // ログイン日の1年後まで生成
+                const endDate = new Date(loginDate);
+                endDate.setFullYear(loginDate.getFullYear() + 1);
+                endDate.setHours(0,0,0,0);
+
+                while (currentDateTemp <= endDate) {
+                    // 日付と価格のペアを追加
+                    data.push({ date: new Date(currentDateTemp), value: Math.max(100, currentValue) }); // 最低価格を100とする
+
+                    // 次の日の価格を計算
+                    const changePercent = (Math.random() - 0.5) * 2 * volatility + trend; // ランダム変動＋トレンド
+                    currentValue *= (1 + changePercent);
+
+                    // 次の日に進む
+                    currentDateTemp.setDate(currentDateTemp.getDate() + 1);
+                }
+                console.log(`generateDummyData完了: ${courseId}, データ件数=${data.length}`);
+                return data;
+            } catch (error) {
+                console.error(`generateDummyData エラー: ${courseId}`, error);
+                return [];
+            }
+        }
+
+        // --- 1年後の予測データ生成関数 ---
+        function generateForecastData(courseId, days = 365) {
+            const fullData = allCourseData[courseId];
+            if (!fullData || fullData.length === 0) return [];
+
+            const lastDataPoint = fullData[fullData.length - 1];
+            let currentValue = lastDataPoint.value;
+            let currentDate = new Date(lastDataPoint.date);
+
+            const forecast = [{ date: new Date(currentDate), value: currentValue }]; // 開始点
+            const courseInfo = courseDetails[courseId];
+            const volatility = courseInfo.volatility;
+            const trend = courseInfo.trend;
+
+            for (let i = 0; i < days; i++) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                const changePercent = (Math.random() - 0.5) * 2 * volatility + trend;
+                currentValue *= (1 + changePercent);
+                forecast.push({ date: new Date(currentDate), value: Math.max(100, currentValue) });
+            }
+            return forecast;
+        }
+
+
+        // --- 期間に応じてデータをフィルタリング/間引く関数 ---
+        function filterDataByPeriod(fullData, period) {
+            const today = new Date(currentDate);
+            today.setHours(0,0,0,0);
+            let startDate = new Date(today);
+            let step = 1; // 間引きステップ (1なら毎日)
+
+            switch (period) {
+                case '1M':
+                    startDate.setMonth(today.getMonth() - 1);
+                    step = 1; // 1ヶ月は毎日
+                    break;
+                case '3M':
+                    startDate.setMonth(today.getMonth() - 3);
+                    step = 1; // 3ヶ月も毎日
+                    break;
+                case '6M':
+                    startDate.setMonth(today.getMonth() - 6);
+                    step = 3; // 6ヶ月は3日に1回程度
+                    break;
+                case '1Y':
+                    startDate.setFullYear(today.getFullYear() - 1);
+                    step = 7; // 1年は週に1回程度
+                    break;
+                case '5Y':
+                default: // デフォルトは5年
+                    startDate.setFullYear(today.getFullYear() - 5);
+                    step = 30; // 5年は月に1回程度
+                    break;
+            }
+
+            const filteredData = [];
+            let counter = 0;
+            for (let i = fullData.length - 1; i >= 0; i--) {
+                const item = fullData[i];
+                if (item.date >= startDate) {
+                    if (counter % step === 0 || period === '1M' || period === '3M') { // 1M, 3Mは間引かない
+                         // フィルタリングされたデータを *古い順* に追加していく
+                         filteredData.unshift(item);
+                    }
+                    counter++;
+                } else {
+                    // startDateより前のデータになったらループを抜ける（データは日付順と仮定）
+                    // 最後のデータだけは必ず含める（開始点として）
+                    if (filteredData.length === 0 && i >= 0) {
+                        filteredData.unshift(fullData[i]);
+                    }
+                    break;
+                }
+            }
+             // 最初のデータがstartDateより少し前の場合があるので、フィルタリング
+             const finalData = filteredData.filter(d => d.date >= startDate);
+             // 期間の開始点がない場合は、フィルタリング前の最初の点を追加
+             if (finalData.length > 0 && finalData[0].date > startDate && filteredData.length > 0) {
+                 const firstPointOriginal = filteredData.find(d => d.date < finalData[0].date);
+                 if(firstPointOriginal) finalData.unshift(firstPointOriginal);
+             } else if (finalData.length === 0 && filteredData.length > 0) {
+                 // フィルター後データがない場合（期間内にデータがない）、元の最後の点を追加
+                 finalData.push(filteredData[filteredData.length - 1]);
+             }
+
+            return finalData;
+        }
+
+
+        // --- チャート作成/更新関数 ---
+        function createOrUpdateChart(courseId, period = '1Y', isForecast = false) {
+            console.log(`createOrUpdateChart: courseId=${courseId}, period=${period}, isForecast=${isForecast}`);
+            const courseInfo = courseDetails[courseId];
+            const ctx = document.getElementById(`${courseId}Chart`);
+            if (!ctx) {
+                console.error(`Canvas element not found for ${courseId}`);
+                return;
+            }
+
+            let displayData, labels, values;
+            if (isForecast) {
+                displayData = generateForecastData(courseId);
+                labels = displayData.map(item => item.date);
+                values = displayData.map(item => item.value);
+            } else {
+                const fullData = allCourseData[courseId];
+                if (!fullData) {
+                    console.error(`Data not found for ${courseId}`);
+                    return;
+                }
+                console.log(`${courseId}: フルデータ件数 = ${fullData.length}`);
+                displayData = filterDataByPeriod(fullData, period);
+                console.log(`${courseId}: フィルター後データ件数 = ${displayData.length}`);
+                labels = displayData.map(item => item.date);
+                values = displayData.map(item => item.value);
+            }
+
+
+            const chartConfig = {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: courseInfo.name,
+                        data: values,
+                        borderColor: courseInfo.color,
+                        backgroundColor: `${courseInfo.color}33`, // 少し透明な背景色
+                        borderWidth: 2,
+                        pointRadius: 0, // 通常は点を非表示
+                        pointHoverRadius: 5, // ホバー時に点を表示
+                        tension: 0.1, // 線の滑らかさ
+                        fill: true // 線の下を塗る
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // コンテナに合わせて伸縮
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: isForecast ? 'month' : calculateTimeUnit(period), // 期間に応じて単位を自動調整
+                                tooltipFormat: 'yyyy/MM/dd', // ツールチップの日付フォーマット
+                                displayFormats: { // 表示フォーマット調整
+                                    day: 'MM/dd',
+                                    week: 'MM/dd',
+                                    month: 'yy/MM',
+                                    year: 'yyyy'
+                                }
+                            },
+                            grid: {
+                                display: false // X軸グリッド非表示
+                            },
+                            ticks: {
+                                maxTicksLimit: 6, // X軸ラベルの最大数
+                                autoSkip: true, // 自動でラベルを間引く
+                                font: { size: 10 }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: '価格 (pt)',
+                                font: { size: 12 }
+                            },
+                            beginAtZero: false, // Y軸を0から始めない
+                            grid: {
+                                color: '#eee', // Y軸グリッドを薄く
+                                drawBorder: false
+                            },
+                             ticks: {
+                                font: { size: 10 },
+                                // Y軸の値をよしなにフォーマット (例: 10000 -> 10k)
+                                callback: function(value, index, values) {
+                                     if (value >= 1000) {
+                                        return (value / 1000).toFixed(1) + 'k';
+                                     }
+                                     return value;
+                                 }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // 凡例は非表示
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0,0,0,0.7)',
+                            titleFont: { size: 12 },
+                            bodyFont: { size: 12 },
+                            padding: 10,
+                            caretPadding: 10,
+                             callbacks: {
+                                // ツールチップの値を整数にする
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += Math.round(context.parsed.y).toLocaleString() + ' pt'; // 整数にしてカンマ区切り
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            };
+
+            // 既存のチャートがあれば更新、なければ新規作成
+            if (chartInstances[courseId]) {
+                const chart = chartInstances[courseId];
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = values;
+                chart.options.scales.x.time.unit = isForecast ? 'month' : calculateTimeUnit(period); // X軸単位更新
+                chart.update();
+            } else {
+                chartInstances[courseId] = new Chart(ctx, chartConfig);
+            }
+
+            if (!isForecast) {
+                // 期間フィルターボタンのアクティブ状態を更新
+                document.querySelectorAll(`.time-filters[data-course="${courseId}"] .time-filter`).forEach(btn => {
+                    if (btn.dataset.period === period) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+        }
+
+        // X軸の時間単位を期間に応じて決定するヘルパー関数
+        function calculateTimeUnit(period) {
+            switch (period) {
+                case '1M': return 'day';
+                case '3M': return 'week';
+                case '6M': return 'month';
+                case '1Y': return 'month';
+                case '5Y': return 'year';
+                default: return 'month';
+            }
+        }
+
+        // 運用可能資産表示を更新する関数
+        function updateAvailablePointsDisplay() {
+            const formattedPoints = availablePoints.toLocaleString(); // カンマ区切り
+            if (screen1BalanceDisplay) {
+                screen1BalanceDisplay.innerHTML = `${formattedPoints}<span class="points-small">pt</span>`;
+            }
+            if (screen2BalanceDisplay) {
+                screen2BalanceDisplay.innerHTML = `${formattedPoints}<span class="points-small">pt</span>`;
+            }
+            if (withdrawBalanceDisplay) {
+                withdrawBalanceDisplay.innerHTML = `${formattedPoints}<span class="points-small">pt</span>`;
+            }
+            updateAddButtonsState();
+            validateAddButton();
+        }
+
+        // Screen2のクイック追加ボタンの状態を更新する関数
+        function updateAddButtonsState() {
+            const originalAvailable = parseInt(pointsInput.dataset.originalAvailable || availablePoints, 10);
+            add100Button.disabled = originalAvailable < 100;
+            add500Button.disabled = originalAvailable < 500;
+            add1000Button.disabled = originalAvailable < 1000;
+            addAllButton.disabled = originalAvailable <= 0;
+        }
+
+        // Screen2の「追加する」ボタンの有効/無効状態を更新する関数
+        function validateAddButton() {
+            const pointsToAdd = parseInt(pointsInput.value, 10) || 0;
+            const originalAvailable = parseInt(pointsInput.dataset.originalAvailable || availablePoints, 10);
+            addButton.disabled = !(pointsToAdd > 0 && Number.isInteger(pointsToAdd) && pointsToAdd <= originalAvailable);
+        }
+
+        // 引き出し画面のボタンの有効/無効状態を更新する関数
+        function validateWithdrawButton() {
+            const pointsToWithdraw = parseInt(withdrawPointsInput.value, 10) || 0;
+            const maxWithdraw = parseInt(withdrawPointsInput.dataset.maxWithdraw || 0, 10);
+            withdrawButton.disabled = !(pointsToWithdraw > 0 && Number.isInteger(pointsToWithdraw) && pointsToWithdraw <= maxWithdraw);
+        }
+
+        // 引き出しクイックボタンの状態を更新する関数
+        function updateWithdrawButtonsState() {
+            const maxWithdraw = parseInt(withdrawPointsInput.dataset.maxWithdraw || 0, 10);
+            withdraw100Button.disabled = maxWithdraw < 100;
+            withdraw500Button.disabled = maxWithdraw < 500;
+            withdraw1000Button.disabled = maxWithdraw < 1000;
+            withdrawAllButton.disabled = maxWithdraw <= 0;
+        }
+
+        // ポイント引き出し処理関数（クイック引き出し用）
+        function withdrawPoints(amount) {
+            const currentInputVal = parseInt(withdrawPointsInput.value, 10) || 0;
+            const amountToWithdraw = parseInt(amount, 10);
+            const maxWithdraw = parseInt(withdrawPointsInput.dataset.maxWithdraw, 10);
+
+            if (!isNaN(amountToWithdraw) && (currentInputVal + amountToWithdraw) <= maxWithdraw) {
+                withdrawPointsInput.value = currentInputVal + amountToWithdraw;
+                validateWithdrawButton();
+            } else if ((currentInputVal + amountToWithdraw) > maxWithdraw) {
+                withdrawPointsInput.value = maxWithdraw;
+                validateWithdrawButton();
+            } else {
+                console.warn(`引き出しできません: ${amount}pt`);
+            }
+        }
+
+        // 全額引き出し処理関数
+        function withdrawAllPoints() {
+            const maxWithdraw = parseInt(withdrawPointsInput.dataset.maxWithdraw, 10);
+            if (maxWithdraw > 0) {
+                withdrawPointsInput.value = maxWithdraw;
+                validateWithdrawButton();
+            }
+        }
+
+        // 画面表示関数
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+            const targetScreen = document.getElementById(screenId);
+            if (targetScreen) {
+                targetScreen.classList.add('active');
+            } else {
+                console.error("Screen not found:", screenId);
+                return; // 画面が見つからなければここで終了
+            }
+
+            // ポイント追加画面(screen2)が表示される際の処理
+            if (screenId === 'screen2') {
+                pointsInput.dataset.originalAvailable = availablePoints;
+                updateAvailablePointsDisplay();
+                pointsInput.value = "0";
+                validateAddButton();
+                const backToAddBtn = document.getElementById('backToDetailFromAdd');
+                 if (currentCourseId) {
+                    backToAddBtn.setAttribute('onclick', `showScreen('${currentCourseId}DetailScreen')`);
+                } else {
+                     backToAddBtn.setAttribute('onclick', "showScreen('screen1')");
+                }
+            }
+            // 引き出し画面(withdrawScreen)が表示される際の処理
+            else if (screenId === 'withdrawScreen') {
+                if (currentCourseId && courseDetails[currentCourseId]) {
+                    const details = courseDetails[currentCourseId];
+                    const holding = userHoldings[currentCourseId] || { invested: 0, units: 0 };
+                    
+                    // 現在の保有ポイントを計算
+                    let currentHoldingPoints = 0;
+                    if (holding.invested > 0 && allCourseData[currentCourseId]) {
+                        const currentPrice = getCurrentPrice(currentCourseId);
+                        currentHoldingPoints = Math.round(holding.units * currentPrice);
+                    }
+                    
+                    withdrawPointsInput.dataset.maxWithdraw = currentHoldingPoints;
+                    withdrawCurrentPoints.innerHTML = `${currentHoldingPoints.toLocaleString()}<span class="points-small">pt</span>`;
+                    withdrawCourseName.textContent = details.name;
+                    withdrawCourseIcon.className = `course-icon ${details.iconClass}`;
+                    withdrawCourseIcon.textContent = details.iconText;
+                    
+                    updateAvailablePointsDisplay();
+                    withdrawPointsInput.value = "0";
+                    updateWithdrawButtonsState();
+                    validateWithdrawButton();
+                    
+                    const backToWithdrawBtn = document.getElementById('backToDetailFromWithdraw');
+                    backToWithdrawBtn.setAttribute('onclick', `showScreen('${currentCourseId}DetailScreen')`);
+                }
+            }
+            // メイン画面(screen1)が表示される際の処理
+            else if (screenId === 'screen1') {
+                updateAvailablePointsDisplay();
+                updateUserHoldingsDisplay();
+                updateCurrentDateDisplay();
+            }
+             // 詳細画面が表示される際の処理
+             else if (screenId.endsWith('DetailScreen')) {
+                 const courseId = screenId.replace('DetailScreen', '');
+                 if (courseDetails[courseId] && allCourseData[courseId]) {
+                      // デフォルトで1年表示
+                     createOrUpdateChart(courseId, '1Y');
+                     // 保有状況を更新
+                     updateCourseHoldingStatus(courseId);
+                 }
+             }
+        }
+
+        // コース詳細画面表示関数
+        function showCourseDetail(courseId) {
+            currentCourseId = courseId; // 現在表示しているコースIDを記憶
+            showScreen(courseId + 'DetailScreen');
+            // showScreen関数内でチャート描画が呼び出される
+        }
+
+        // タブ切り替え関数
+        function switchTab(tabElement, contentId) {
+            // タブのアクティブ状態を切り替え
+            tabElement.parentNode.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            tabElement.classList.add('active');
+
+            // コンテンツの表示を切り替え
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            const activeContent = document.getElementById(contentId);
+            if (activeContent) {
+                activeContent.style.display = 'block';
+            }
+
+            // PayPayポイント運用タブが選択されたらQRコードを生成
+            if (contentId === 'paypayLinkContent' && !ppPointQR.src) {
+                const deeplink = 'https://paypay.ne.jp/point-operation2/';
+                ppPointQR.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(deeplink)}`;
+            }
+        }
+
+        // ポイント追加処理関数 (クイック追加用)
+        function addPoints(amount) {
+            const currentInputVal = parseInt(pointsInput.value, 10) || 0;
+            const amountToAdd = parseInt(amount, 10);
+            const originalAvailable = parseInt(pointsInput.dataset.originalAvailable, 10);
+
+            if (!isNaN(amountToAdd) && (currentInputVal + amountToAdd) <= originalAvailable) {
+                pointsInput.value = currentInputVal + amountToAdd;
+                validateAddButton();
+            } else if ((currentInputVal + amountToAdd) > originalAvailable) {
+                 pointsInput.value = originalAvailable;
+                 validateAddButton();
+            } else {
+                console.warn(`追加できません: ${amount}pt`);
+            }
+        }
+
+        // 全額追加処理関数
+        function addAllPoints() {
+            const originalAvailable = parseInt(pointsInput.dataset.originalAvailable, 10);
+            if (originalAvailable > 0) {
+                pointsInput.value = originalAvailable;
+                validateAddButton();
+            }
+        }
+
+        // メイン画面の保有状況を更新する関数
+        function updateUserHoldingsDisplay() {
+            Object.keys(courseDetails).forEach(courseId => {
+                const card = document.querySelector(`.course-card[onclick="showCourseDetail('${courseId}')"]`);
+                if (!card) return;
+
+                const holding = userHoldings[courseId] || { invested: 0, units: 0 };
+                const pointsSection = card.querySelector('.points-section');
+
+                if (holding.invested > 0 && allCourseData[courseId] && allCourseData[courseId].length > 0) {
+                    const currentPrice = getCurrentPrice(courseId);
+                    const currentValue = Math.round(holding.units * currentPrice);
+                    const profit = currentValue - holding.invested;
+                    const profitRate = (profit / holding.invested * 100).toFixed(2);
+
+                    const profitSign = profit >= 0 ? '+' : '';
+                    const profitClass = profit >= 0 ? 'change-positive' : 'change-negative';
+
+                    pointsSection.innerHTML = `
+                        <div class="points">${currentValue.toLocaleString()}<span class="points-small">pt</span></div>
+                        <div class="points ${profitClass}">${profitSign}${profit.toLocaleString()}<span class="points-small">pt</span></div>
+                        <div class="points-small ${profitClass}">(${profitSign}${profitRate}%)</div>
+                    `;
+                } else {
+                    pointsSection.innerHTML = `
+                        <div class="points">0<span class="points-small">pt</span></div>
+                        <div class="points change-positive">0<span class="points-small">pt</span></div>
+                        <div class="points-small change-positive">(0%)</div>
+                    `;
+                }
+            });
+            
+            // 投資状況サマリーも更新
+            updateInvestmentSummary();
+        }
+
+        // --- 現在日付での価格を取得する関数 ---
+        function getCurrentPrice(courseId) {
+            const courseData = allCourseData[courseId];
+            if (!courseData || courseData.length === 0) return 10000;
+            
+            // currentDate以前の最新データを探す
+            for (let i = courseData.length - 1; i >= 0; i--) {
+                if (courseData[i].date <= currentDate) {
+                    return courseData[i].value;
+                }
+            }
+            
+            // 見つからない場合は最初のデータを返す
+            return courseData[0].value;
+        }
+
+        // --- 日付をフォーマットする関数 ---
+        function formatDate(date) {
+            return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+        }
+
+        // --- 現在日付を更新する関数 ---
+        function updateCurrentDateDisplay() {
+            document.getElementById('currentDateText').textContent = formatDate(currentDate);
+            document.getElementById('currentDateInOperation').textContent = formatDate(currentDate);
+            
+            const maxDate = new Date(loginDate);
+            maxDate.setFullYear(loginDate.getFullYear() + 1);
+            document.getElementById('maxDateInOperation').textContent = formatDate(maxDate);
+            
+            // 運用ボタンの有効/無効を更新
+            updateAdvanceTimeButtons();
+        }
+
+        // --- 運用ボタンの有効/無効を更新する関数 ---
+        function updateAdvanceTimeButtons() {
+            const maxDate = new Date(loginDate);
+            maxDate.setFullYear(loginDate.getFullYear() + 1);
+            
+            document.querySelectorAll('.advance-time-btn').forEach(btn => {
+                const months = parseInt(btn.dataset.months);
+                const futureDate = new Date(currentDate);
+                futureDate.setMonth(futureDate.getMonth() + months);
+                
+                if (futureDate > maxDate) {
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                    btn.style.cursor = 'not-allowed';
+                } else {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                }
+            });
+        }
+
+        // --- 運用履歴を追加する関数 ---
+        function addTransactionHistory(type, courseId, points, date = null) {
+            const transactionDate = date || new Date(currentDate);
+            
+            // 同じ日の取引回数をカウント
+            const sameDayTransactions = transactionHistory.filter(t => {
+                const tDate = new Date(t.date);
+                return tDate.getFullYear() === transactionDate.getFullYear() &&
+                       tDate.getMonth() === transactionDate.getMonth() &&
+                       tDate.getDate() === transactionDate.getDate();
+            });
+            const dailyTransactionNumber = sameDayTransactions.length + 1;
+            
+            const transaction = {
+                date: transactionDate,
+                type: type, // 'add' or 'withdraw'
+                courseId: courseId,
+                courseName: courseDetails[courseId]?.name || 'Unknown',
+                points: points,
+                dailyNumber: dailyTransactionNumber // 同じ日の何回目の取引か
+            };
+            transactionHistory.push(transaction);
+            updateHistoryDisplay();
+        }
+
+        // --- 運用履歴を表示する関数 ---
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            const emptyHistory = document.getElementById('emptyHistory');
+            
+            if (transactionHistory.length === 0) {
+                historyList.innerHTML = '';
+                emptyHistory.style.display = 'block';
+                return;
+            }
+            
+            emptyHistory.style.display = 'none';
+            
+            // 新しい順に表示
+            const sortedHistory = [...transactionHistory].reverse();
+            
+            historyList.innerHTML = sortedHistory.map(transaction => {
+                const typeText = transaction.type === 'add' ? '追加' : '引き出し';
+                const typeColor = transaction.type === 'add' ? '#4CAF50' : '#FF4B4B';
+                const typeIcon = transaction.type === 'add' ? '+' : '-';
+                
+                return `
+                    <div style="border-bottom: 1px solid #eee; padding: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-size: 12px; color: #777;">
+                                    ${formatDate(transaction.date)}
+                                    <span style="font-size: 10px; color: #bbb; margin-left: 5px;">#${transaction.dailyNumber}</span>
+                                </div>
+                                <div style="font-weight: bold; margin-top: 5px;">${transaction.courseName}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: ${typeColor}; font-weight: bold; font-size: 16px;">
+                                    ${typeIcon}${transaction.points.toLocaleString()}pt
+                                </div>
+                                <div style="font-size: 12px; color: #777;">${typeText}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- 投資状況サマリーを更新する関数 ---
+        function updateInvestmentSummary() {
+            let totalInvested = 0;
+            let totalValue = 0;
+            
+            Object.keys(userHoldings).forEach(courseId => {
+                const holding = userHoldings[courseId];
+                if (holding.invested > 0) {
+                    totalInvested += holding.invested;
+                    const currentPrice = getCurrentPrice(courseId);
+                    totalValue += Math.round(holding.units * currentPrice);
+                }
+            });
+            
+            const totalProfit = totalValue - totalInvested;
+            const profitSign = totalProfit >= 0 ? '+' : '';
+            const profitColor = totalProfit >= 0 ? '#90EE90' : '#FFB6C1';
+            
+            document.getElementById('totalInvested').textContent = totalInvested.toLocaleString() + 'pt';
+            document.getElementById('totalValue').textContent = totalValue.toLocaleString() + 'pt';
+            const totalProfitElement = document.getElementById('totalProfit');
+            totalProfitElement.textContent = profitSign + totalProfit.toLocaleString() + 'pt';
+            totalProfitElement.style.color = profitColor;
+        }
+
+        // --- コース詳細画面の保有状況を更新する関数 ---
+        function updateCourseHoldingStatus(courseId) {
+            const holding = userHoldings[courseId] || { invested: 0, units: 0 };
+            const currentPrice = getCurrentPrice(courseId);
+            
+            // 現在価格の表示
+            const priceElement = document.getElementById(`${courseId}CurrentPrice`);
+            if (priceElement) {
+                priceElement.textContent = `現在価格: ${Math.round(currentPrice).toLocaleString()}pt`;
+            }
+            
+            // 投資額の表示
+            const investedElement = document.getElementById(`${courseId}Invested`);
+            if (investedElement) {
+                investedElement.textContent = holding.invested.toLocaleString() + 'pt';
+            }
+            
+            // 評価額の表示
+            let currentValue = 0;
+            if (holding.invested > 0) {
+                currentValue = Math.round(holding.units * currentPrice);
+            }
+            const valueElement = document.getElementById(`${courseId}Value`);
+            if (valueElement) {
+                valueElement.textContent = currentValue.toLocaleString() + 'pt';
+            }
+            
+            // 累計損益の表示
+            const profit = currentValue - holding.invested;
+            const profitElement = document.getElementById(`${courseId}Profit`);
+            if (profitElement) {
+                const profitSign = profit >= 0 ? '+' : '';
+                profitElement.textContent = profitSign + profit.toLocaleString() + 'pt';
+                profitElement.style.color = profit >= 0 ? '#4CAF50' : '#f44336';
+            }
+        }
+
+        // --- イベントリスナー設定 ---
+
+        // 詳細画面の「引き出す（交換）」ボタン
+        document.querySelectorAll('.button-pink-text').forEach(button => {
+            if (button.textContent.includes('引き出す（交換）')) {
+                button.addEventListener('click', function() {
+                    const detailScreen = this.closest('.screen[id$="DetailScreen"]');
+                    if (detailScreen) {
+                        const screenId = detailScreen.id;
+                        const courseId = screenId.replace('DetailScreen', '');
+                        
+                        if (courseId && courseDetails[courseId]) {
+                            currentCourseId = courseId;
+                            showScreen('withdrawScreen');
+                        }
+                    }
+                });
+            }
+        });
+
+        // --- ログイン機能 ---
+        const loginButton = document.getElementById('loginButton');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginError = document.getElementById('loginError');
+
+        loginButton.addEventListener('click', function() {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            const correctUsername = 'pp001';
+            const correctPassword = '12345';
+
+            if (username === correctUsername && password === correctPassword) {
+                loginError.textContent = '';
+                // ログイン時の初期化処理
+                initializeSimulator();
+                showScreen('screen1');
+            } else {
+                 loginError.textContent = 'ユーザー名またはパスワードが正しくありません。';
+            }
+        });
+
+        passwordInput.addEventListener('keypress', (event) => event.key === 'Enter' && loginButton.click());
+        usernameInput.addEventListener('keypress', (event) => event.key === 'Enter' && passwordInput.focus());
+
+        // --- 初期化関数 ---
+        function initializeSimulator() {
+            console.log('=== initializeSimulator 開始 ===');
+            loginDate = new Date('2024-06-30');
+            currentDate = new Date('2024-06-30');
+            availablePoints = 5000;
+            userHoldings = {};
+            transactionHistory = [];
+            Object.keys(courseDetails).forEach(id => {
+                userHoldings[id] = { invested: 0, units: 0 };
+            });
+
+             // チャートインスタンスを破棄
+            Object.values(chartInstances).forEach(chart => chart.destroy());
+            chartInstances = {};
+            allCourseData = {};
+
+            // データ初期化
+            Object.keys(courseDetails).forEach(id => {
+                console.log(`コース ${id} のデータ初期化中...`);
+                if (embeddedData[id] && embeddedData[id].length > 0) {
+                    console.log(`${id}: 埋め込みデータを使用 (${embeddedData[id].length}件)`);
+                    allCourseData[id] = embeddedData[id]
+                        .map(d => ({ date: new Date(d.date), value: d.value }))
+                        .sort((a, b) => a.date - b.date); // 日付でソート
+                } else {
+                    console.log(`${id}: ダミーデータを生成`);
+                    allCourseData[id] = generateDummyData(id);
+                }
+                console.log(`${id}: 現在価格 = ${getCurrentPrice(id)}`);
+            });
+
+            updateAvailablePointsDisplay();
+            updateUserHoldingsDisplay();
+            updateCurrentDateDisplay();
+            updateHistoryDisplay();
+            updateInvestmentSummary(); // 追加
+            console.log('=== initializeSimulator 完了 ===');
+        }
+
+        // 詳細画面の「ポイントを追加する」ボタン
+        document.querySelectorAll('.add-points-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const detailScreen = this.closest('.screen[id$="DetailScreen"]');
+                if (detailScreen) {
+                    const screenId = detailScreen.id;
+                    const courseId = screenId.replace('DetailScreen', '');
+
+                    if (courseId && courseDetails[courseId]) {
+                        currentCourseId = courseId;
+                        const details = courseDetails[courseId];
+                        addPointsCourseName.textContent = details.name;
+                        addPointsCourseIcon.className = `course-icon ${details.iconClass}`;
+                        addPointsCourseIcon.textContent = details.iconText;
+
+                        // screen2 のコースごとの現在のポイント数を更新
+                        const holdingsDisplay = document.querySelector('#screen2 .course-card .points');
+                        const holding = userHoldings[courseId] || { invested: 0, units: 0 };
+                        if (holding.invested > 0) {
+                            const currentPrice = getCurrentPrice(courseId);
+                            const currentValue = Math.round(holding.units * currentPrice);
+                             holdingsDisplay.innerHTML = `${currentValue.toLocaleString()}<span class="points-small">pt</span>`;
+                        } else {
+                             holdingsDisplay.innerHTML = `0<span class="points-small">pt</span>`;
+                        }
+
+
+                        showScreen('screen2');
+                    } else {
+                        console.error("コースIDの抽出または詳細情報の取得に失敗:", screenId);
+                    }
+                }
+            });
+        });
+
+        // Screen2 のクイック追加ボタン
+        add100Button.addEventListener('click', () => addPoints(100));
+        add500Button.addEventListener('click', () => addPoints(500));
+        add1000Button.addEventListener('click', () => addPoints(1000));
+        addAllButton.addEventListener('click', addAllPoints);
+
+        // Screen2 のリセットボタン
+        resetAddPointsButton.addEventListener('click', () => {
+            pointsInput.value = '0';
+            validateAddButton();
+        });
+
+        // Screen2 のポイント入力変更時
+        pointsInput.addEventListener('input', validateAddButton);
+
+        // 引き出し画面のクイック引き出しボタン
+        withdraw100Button.addEventListener('click', () => withdrawPoints(100));
+        withdraw500Button.addEventListener('click', () => withdrawPoints(500));
+        withdraw1000Button.addEventListener('click', () => withdrawPoints(1000));
+        withdrawAllButton.addEventListener('click', withdrawAllPoints);
+
+        // 引き出し画面のリセットボタン
+        resetWithdrawButton.addEventListener('click', () => {
+            withdrawPointsInput.value = '0';
+            validateWithdrawButton();
+        });
+
+        // 引き出し画面のポイント入力変更時
+        withdrawPointsInput.addEventListener('input', validateWithdrawButton);
+
+        // Screen2 の「追加する」ボタン
+        addButton.addEventListener('click', function() {
+            const pointsToAdd = parseInt(pointsInput.value, 10) || 0;
+             confirmPointsDisplay.textContent = pointsToAdd.toLocaleString();
+             if (currentCourseId && courseDetails[currentCourseId]) {
+                 const details = courseDetails[currentCourseId];
+                 confirmCourseName.textContent = details.name;
+                 confirmCourseIcon.className = `to-icon ${details.iconClass}`;
+                 confirmCourseIcon.innerHTML = `<div style="color: white; font-weight: bold;">${details.iconText}</div>`;
+             } else {
+                 confirmCourseName.textContent = "コース不明";
+                 confirmCourseIcon.className = `to-icon`;
+                 confirmCourseIcon.innerHTML = `？`;
+             }
+            showScreen('screen3');
+        });
+
+        // Screen3 の「追加する」（確定）ボタン
+        document.getElementById('confirmButton').addEventListener('click', function() {
+            const pointsAdded = parseInt(pointsInput.value, 10) || 0; // screen2の入力値
+
+            availablePoints -= pointsAdded;
+
+            // 保有状況を更新
+            if (currentCourseId && allCourseData[currentCourseId]) {
+                const currentPrice = getCurrentPrice(currentCourseId);
+                if (currentPrice > 0) {
+                    const unitsAdded = pointsAdded / currentPrice;
+                    userHoldings[currentCourseId].invested += pointsAdded;
+                    userHoldings[currentCourseId].units += unitsAdded;
+                }
+            }
+
+            // 履歴に追加
+            addTransactionHistory('add', currentCourseId, pointsAdded);
+
+            const now = new Date(currentDate);
+            const formattedTime = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours()}時${String(now.getMinutes()).padStart(2, '0')}分${String(now.getSeconds()).padStart(2, '0')}秒`;
+
+            completionPointsDisplay.textContent = pointsAdded.toLocaleString();
+            completionDetailPoints.textContent = pointsAdded.toLocaleString();
+            completionTimeDisplay.textContent = formattedTime;
+
+            if (currentCourseId && courseDetails[currentCourseId]) {
+                const details = courseDetails[currentCourseId];
+                completeCourseName.textContent = details.name;
+                completeDetailCourseName.textContent = details.name;
+                completeCourseIcon.className = `course-icon ${details.iconClass}`;
+                completeCourseIcon.textContent = details.iconText;
+                completeCourseIcon.style.cssText = 'margin: 20px auto; width: 60px; height: 60px; font-size: 24px; display: flex; align-items: center; justify-content: center;';
+            }
+
+            updateAvailablePointsDisplay();
+            updateUserHoldingsDisplay();
+            showScreen('screen4');
+        });
+
+        // Screen4 の「運用状況に戻る」ボタン
+        document.getElementById('returnButton').addEventListener('click', () => showScreen('screen1'));
+
+        // 引き出し画面の「引き出す」ボタン
+        withdrawButton.addEventListener('click', function() {
+            const pointsToWithdraw = parseInt(withdrawPointsInput.value, 10) || 0;
+            withdrawConfirmPoints.textContent = pointsToWithdraw.toLocaleString();
+            if (currentCourseId && courseDetails[currentCourseId]) {
+                const details = courseDetails[currentCourseId];
+                withdrawConfirmCourseName.textContent = details.name;
+                withdrawConfirmCourseIcon.className = `from-icon ${details.iconClass}`;
+                withdrawConfirmCourseIcon.innerHTML = `<div style="color: white; font-weight: bold;">${details.iconText}</div>`;
+            }
+            showScreen('withdrawConfirmScreen');
+        });
+
+        // 引き出し確認画面の「引き出す」（確定）ボタン
+        document.getElementById('withdrawConfirmButton').addEventListener('click', function() {
+            const pointsWithdrawn = parseInt(withdrawPointsInput.value, 10) || 0;
+
+            // 保有状況を更新
+            if (currentCourseId && allCourseData[currentCourseId]) {
+                const currentPrice = getCurrentPrice(currentCourseId);
+                if (currentPrice > 0) {
+                    const unitsToWithdraw = pointsWithdrawn / currentPrice;
+                    userHoldings[currentCourseId].units -= unitsToWithdraw;
+                    
+                    // unitsがほぼ0になったら、invested（元本）も0にリセット
+                    if (userHoldings[currentCourseId].units < 0.0001) {
+                        userHoldings[currentCourseId].units = 0;
+                        userHoldings[currentCourseId].invested = 0;
+                    } else {
+                        // 比例して元本も減らす
+                        const remainingRatio = userHoldings[currentCourseId].units * currentPrice / (userHoldings[currentCourseId].units * currentPrice + pointsWithdrawn);
+                        userHoldings[currentCourseId].invested = Math.round(userHoldings[currentCourseId].invested * remainingRatio);
+                    }
+                }
+            }
+
+            availablePoints += pointsWithdrawn;
+
+            // 履歴に追加
+            addTransactionHistory('withdraw', currentCourseId, pointsWithdrawn);
+
+            const now = new Date(currentDate);
+            const formattedTime = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日 ${now.getHours()}時${String(now.getMinutes()).padStart(2, '0')}分${String(now.getSeconds()).padStart(2, '0')}秒`;
+
+            withdrawCompletionPoints.textContent = pointsWithdrawn.toLocaleString();
+            withdrawCompletionDetailPoints.textContent = pointsWithdrawn.toLocaleString();
+            withdrawCompletionTime.textContent = formattedTime;
+
+            if (currentCourseId && courseDetails[currentCourseId]) {
+                const details = courseDetails[currentCourseId];
+                withdrawCompleteCourseName.textContent = details.name;
+                withdrawCompleteDetailCourseName.textContent = details.name;
+                withdrawCompleteCourseIcon.className = `course-icon ${details.iconClass}`;
+                withdrawCompleteCourseIcon.textContent = details.iconText;
+                withdrawCompleteCourseIcon.style.cssText = 'margin: 20px auto; width: 60px; height: 60px; font-size: 24px; display: flex; align-items: center; justify-content: center;';
+            }
+
+            updateAvailablePointsDisplay();
+            updateUserHoldingsDisplay();
+            showScreen('withdrawCompleteScreen');
+        });
+
+        // 引き出し完了画面の「運用状況に戻る」ボタン
+        document.getElementById('withdrawReturnButton').addEventListener('click', () => showScreen('screen1'));
+
+         // 各画面の閉じるボタン
+        document.querySelectorAll('.close-button').forEach(button => {
+            button.addEventListener('click', () => {
+                if (confirm('本当にログアウトしますか？')) {
+                    usernameInput.value = '';
+                    passwordInput.value = '';
+                    loginError.textContent = '';
+                    currentCourseId = null;
+                    // 状態をリセット
+                    initializeSimulator();
+                    // ログイン画面に戻る
+                    showScreen('loginScreen');
+                    // タブを初期状態に戻す
+                    switchTab(document.querySelector('.tabs .tab'), 'statusContent');
+                }
+            });
+        });
+
+        // --- 期間フィルターボタンのイベントリスナー ---
+        document.querySelectorAll('.time-filter').forEach(button => {
+            button.addEventListener('click', function() {
+                const courseId = this.closest('.time-filters').dataset.course;
+                const period = this.dataset.period;
+                if (courseId && period) {
+                    createOrUpdateChart(courseId, period);
+                }
+            });
+        });
+
+        // --- 時間を進めるボタンのイベントリスナー ---
+        document.querySelectorAll('.advance-time-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const months = parseInt(this.dataset.months);
+                advanceTime(months);
+            });
+        });
+
+        // --- 1年後予測ボタンのイベントリスナー ---
+        document.querySelectorAll('.forecast-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const detailScreen = this.closest('.screen[id$="DetailScreen"]');
+                const courseId = detailScreen.id.replace('DetailScreen', '');
+                createOrUpdateChart(courseId, null, true); // isForecast = true
+
+                // 他のボタンのアクティブ状態を解除
+                detailScreen.querySelectorAll('.time-filter').forEach(btn => btn.classList.remove('active'));
+            });
+        });
+
+
+        // --- 時間を進める関数 ---
+        function advanceTime(months) {
+            const maxDate = new Date(loginDate);
+            maxDate.setFullYear(loginDate.getFullYear() + 1);
+            
+            const newDate = new Date(currentDate);
+            newDate.setMonth(newDate.getMonth() + months);
+            
+            if (newDate > maxDate) {
+                alert('最大運用期間（1年）を超えることはできません。');
+                return;
+            }
+            
+            const oldDate = new Date(currentDate);
+            currentDate = newDate;
+            
+            const resultDiv = document.getElementById('operationResult');
+            const detailsDiv = document.getElementById('operationDetails');
+            
+            let totalInvested = 0;
+            let totalValueBefore = 0;
+            let totalValueAfter = 0;
+            let details = `<p><strong>運用期間: ${formatDate(oldDate)} → ${formatDate(currentDate)}</strong></p>`;
+            details += '<div style="margin-top: 15px;">';
+            
+            // 各コースの計算
+            Object.keys(userHoldings).forEach(courseId => {
+                const holding = userHoldings[courseId];
+                if (holding.invested > 0) {
+                    // 時間進行前の価格で評価額を計算
+                    const priceBefore = getCurrentPriceAtDate(courseId, oldDate);
+                    const valueBefore = Math.round(holding.units * priceBefore);
+                    
+                    // 時間進行後の価格で評価額を計算
+                    const priceAfter = getCurrentPrice(courseId);
+                    const valueAfter = Math.round(holding.units * priceAfter);
+                    
+                    totalInvested += holding.invested;
+                    totalValueBefore += valueBefore;
+                    totalValueAfter += valueAfter;
+                    
+                    const periodProfit = valueAfter - valueBefore;
+                    const periodProfitRate = ((valueAfter / valueBefore - 1) * 100).toFixed(1);
+                    const totalProfit = valueAfter - holding.invested;
+                    const totalProfitRate = ((valueAfter / holding.invested - 1) * 100).toFixed(1);
+                    
+                    details += `
+                        <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 5px;">
+                            <strong>${courseDetails[courseId].name}</strong><br>
+                            運用前評価額: ${valueBefore.toLocaleString()}pt<br>
+                            運用後評価額: ${valueAfter.toLocaleString()}pt<br>
+                            期間損益: <span style="color: ${periodProfit >= 0 ? '#4CAF50' : '#f44336'}">
+                                ${periodProfit >= 0 ? '+' : ''}${periodProfit.toLocaleString()}pt (${periodProfit >= 0 ? '+' : ''}${periodProfitRate}%)
+                            </span><br>
+                            累計損益: <span style="color: ${totalProfit >= 0 ? '#4CAF50' : '#f44336'}">
+                                ${totalProfit >= 0 ? '+' : ''}${totalProfit.toLocaleString()}pt (${totalProfit >= 0 ? '+' : ''}${totalProfitRate}%)
+                            </span>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (totalInvested === 0) {
+                details = '<p style="color: #777;">運用中のポイントがありません。<br>まず各コースにポイントを追加してください。</p>';
+                currentDate = oldDate; // 時間を戻す
+            } else {
+                const periodProfit = totalValueAfter - totalValueBefore;
+                const periodProfitRate = totalValueBefore > 0 ? ((totalValueAfter / totalValueBefore - 1) * 100).toFixed(1) : '0.0';
+                const totalProfit = totalValueAfter - totalInvested;
+                const totalProfitRate = ((totalValueAfter / totalInvested - 1) * 100).toFixed(1);
+                
+                details += `
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #ddd;">
+                        <strong>合計</strong><br>
+                        投資額: ${totalInvested.toLocaleString()}pt<br>
+                        運用前評価額: ${totalValueBefore.toLocaleString()}pt<br>
+                        運用後評価額: ${totalValueAfter.toLocaleString()}pt<br>
+                        期間損益: <span style="color: ${periodProfit >= 0 ? '#4CAF50' : '#f44336'}; font-size: 16px; font-weight: bold;">
+                            ${periodProfit >= 0 ? '+' : ''}${periodProfit.toLocaleString()}pt (${periodProfit >= 0 ? '+' : ''}${periodProfitRate}%)
+                        </span><br>
+                        累計損益: <span style="color: ${totalProfit >= 0 ? '#4CAF50' : '#f44336'}; font-size: 18px; font-weight: bold;">
+                            ${totalProfit >= 0 ? '+' : ''}${totalProfit.toLocaleString()}pt (${totalProfit >= 0 ? '+' : ''}${totalProfitRate}%)
+                        </span>
+                    </div>
+                `;
+                
+                // 画面を更新
+                updateCurrentDateDisplay();
+                updateUserHoldingsDisplay();
+                updateInvestmentSummary(); // 追加
+            }
+            
+            detailsDiv.innerHTML = details;
+            resultDiv.style.display = 'block';
+        }
+        
+        // --- 特定の日付での価格を取得する関数 ---
+        function getCurrentPriceAtDate(courseId, targetDate) {
+            const courseData = allCourseData[courseId];
+            if (!courseData || courseData.length === 0) return 10000;
+            
+            for (let i = courseData.length - 1; i >= 0; i--) {
+                if (courseData[i].date <= targetDate) {
+                    return courseData[i].value;
+                }
+            }
+            
+            return courseData[0].value;
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+             // 初期状態ではログイン画面を表示
+             // HTML側で#loginScreenにactiveクラスが付与されているのでJSでの操作は不要
+             // 初期タブコンテンツを表示
+             switchTab(document.querySelector('.tabs .tab'), 'statusContent');
+        });
+
+    </script>
+</body>
+</html>
