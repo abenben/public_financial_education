@@ -211,11 +211,13 @@
         .input-container {
             border: 1px solid #ddd;
             border-radius: 5px;
-            padding: 15px;
+            padding: 20px 25px; /* 上下20px、左右25pxに増やして余白を確保 */
             margin-bottom: 20px;
+            box-sizing: border-box; /* borderとpaddingを含めたサイズ計算 */
         }
         .input-container.highlighted {
             border: 2px solid #FF0033;
+            padding: 19px 24px; /* borderが太くなった分、paddingを微調整 */
         }
         .input-label {
             font-size: 14px;
@@ -229,6 +231,7 @@
             border: none;
             width: 100%;
             outline: none;
+            padding: 5px 0; /* 上下に少し余白を追加 */
             /* スピナー非表示 */
             -moz-appearance: textfield;
             appearance: textfield;
@@ -440,9 +443,129 @@
         }
         /* --- 追加スタイルここまで --- */
 
+        /* ローディング画面のスタイル */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .loading-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 300px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .clock-animation {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            position: relative;
+            animation: rotate 2s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .clock-face {
+            width: 100%;
+            height: 100%;
+            border: 4px solid #4285F4;
+            border-radius: 50%;
+            position: relative;
+        }
+        .clock-hand {
+            position: absolute;
+            width: 2px;
+            height: 30px;
+            background: #4285F4;
+            top: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            transform: translate(-50%, -100%);
+        }
+        .clock-center {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #4285F4;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .loading-message {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .loading-submessage {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .loading-progress {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .loading-progress-bar {
+            height: 100%;
+            background: #4285F4;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .loading-dots {
+            font-size: 24px;
+            color: #4285F4;
+        }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+        .loading-dots::after {
+            content: '.';
+            animation: dots 1.5s infinite;
+        }
+
     </style>
 </head>
 <body>
+    <!-- ローディングオーバーレイ -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="clock-animation">
+                <div class="clock-face">
+                    <div class="clock-hand"></div>
+                    <div class="clock-center"></div>
+                </div>
+            </div>
+            <div class="loading-message">時間を進めています<span class="loading-dots"></span></div>
+            <div id="loadingPeriod" class="loading-submessage">1ヶ月後へ移動中</div>
+            <div class="loading-progress">
+                <div id="loadingProgressBar" class="loading-progress-bar"></div>
+            </div>
+            <div style="font-size: 12px; color: #999;">少々お待ちください</div>
+        </div>
+    </div>
+
     <div class="container">
 
         <div id="loginScreen" class="screen active">
@@ -451,7 +574,7 @@
             </div>
             <div class="login-container">
                 <label for="username" style="display: block; margin-bottom: 5px; font-size: 14px; color: #555;">ユーザー名</label>
-                <input type="text" id="username" class="login-input" placeholder="ユーザー名">
+                <input type="text" id="username" class="login-input" placeholder="ユーザー名" autocapitalize="off">
                 <label for="password" style="display: block; margin-bottom: 5px; font-size: 14px; color: #555;">パスワード</label>
                 <input type="password" id="password" class="login-input" placeholder="パスワード">
                 <button id="loginButton" class="login-button">ログイン</button>
@@ -596,7 +719,7 @@
                             最大で<strong id="maxDateInOperation">2025年6月30日</strong>まで運用可能です
                         </p>
                     </div>
-                    
+
                     <div id="advanceTimeButtons" style="display: flex; flex-direction: column; gap: 15px;">
                         <button class="button advance-time-btn" data-months="1" style="background: #9E9E9E; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
                             1ヶ月運用する
@@ -611,7 +734,7 @@
                             1年運用する
                         </button>
                     </div>
-                    
+
                     <div id="operationResult" style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px; display: none;">
                         <h4 style="color: #333; margin-bottom: 15px;">運用結果</h4>
                         <div id="operationDetails" style="color: #555;"></div>
@@ -628,7 +751,7 @@
                         <img id="ppPointQR" src="" alt="PayPayポイント運用 QRコード" style="width: 150px; height: 150px; border: 1px solid #ddd; padding: 5px;">
                     </div>
                     <p style="font-size: 12px; color: #777;">↑ PayPayアプリで読み取ってください</p>
-                    <a href="http://paypay.ne.jp/point-operation1/" target="_blank" class="button button-outline" style="text-decoration: none; display: inline-block; width: auto; padding: 10px 20px; margin-top: 10px;">
+                    <a href="paypay://miniapp?appId=m_512cIsRNmu" target="_blank" class="button button-outline" style="text-decoration: none; display: inline-block; width: auto; padding: 10px 20px; margin-top: 10px;">
                         PayPayポイント運用の詳細を見る
                     </a>
                 </div>
@@ -656,7 +779,7 @@
                     <button class="time-filter active" data-period="1Y">1年</button>
                     <button class="time-filter" data-period="5Y">5年</button>
                 </div>
-                
+
                 <!-- 保有状況セクション -->
                 <div id="goldHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -678,7 +801,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="course-description">
                     <p><strong>連動するETF:</strong> SPDR®︎ゴールド・シェア（GLD）</p>
                     <p><strong>コース概要:</strong> 金の価格に連動することを目指すコースです。金は一般的に、株式市場が不安定な時に「安全資産」として買われる傾向があります。ただし、金価格も様々な要因で変動するため、元本が保証されているわけではありません。</p>
@@ -711,7 +834,7 @@
                      <button class="time-filter active" data-period="1Y">1年</button>
                      <button class="time-filter" data-period="5Y">5年</button>
                  </div>
-                
+
                 <!-- 保有状況セクション -->
                 <div id="standardHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -733,7 +856,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="course-description">
                     <p><strong>連動するETF:</strong> DIREXION S&P 500 3X（SPXL）</p>
                     <p><strong>コース概要:</strong> アメリカの代表的な株価指数であるS&P500指数の一日の値動きの「3倍」の値動きを目指すコースです。大きなリターンが期待できる一方、相場が下がった場合には損失も大きくなる可能性があります。</p>
@@ -766,7 +889,7 @@
                      <button class="time-filter active" data-period="1Y">1年</button>
                      <button class="time-filter" data-period="5Y">5年</button>
                  </div>
-                
+
                 <!-- 保有状況セクション -->
                 <div id="techHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -788,7 +911,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                  <div class="course-description">
                     <p><strong>連動するETF:</strong> DIREXION NASDAQ-100 3X（TQQQ）</p>
                     <p><strong>コース概要:</strong> アメリカのナスダック100指数の一日の値動きの「3倍」の値動きを目指すコースです。ナスダック100はハイテク関連企業の比率が高い指数であり、その3倍の値動きを目指すため、非常に大きなリターンが期待できる一方、下落時のリスクも極めて大きくなります。</p>
@@ -821,7 +944,7 @@
                      <button class="time-filter active" data-period="1Y">1年</button>
                      <button class="time-filter" data-period="5Y">5年</button>
                  </div>
-                
+
                 <!-- 保有状況セクション -->
                 <div id="bitcoinHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -843,7 +966,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="course-description">
                     <p><strong>連動対象（想定）:</strong> ビットコイン価格</p>
                     <p><strong>コース概要:</strong> 代表的な暗号資産（仮想通貨）であるビットコインの価格変動に連動することを目指すコースです（※このコースはシミュレーター上の架空のものです）。ビットコインは価格変動が非常に大きいことで知られています。</p>
@@ -1602,25 +1725,25 @@
                 if (currentCourseId && courseDetails[currentCourseId]) {
                     const details = courseDetails[currentCourseId];
                     const holding = userHoldings[currentCourseId] || { invested: 0, units: 0 };
-                    
+
                     // 現在の保有ポイントを計算
                     let currentHoldingPoints = 0;
                     if (holding.invested > 0 && allCourseData[currentCourseId]) {
                         const currentPrice = getCurrentPrice(currentCourseId);
                         currentHoldingPoints = Math.round(holding.units * currentPrice);
                     }
-                    
+
                     withdrawPointsInput.dataset.maxWithdraw = currentHoldingPoints;
                     withdrawCurrentPoints.innerHTML = `${currentHoldingPoints.toLocaleString()}<span class="points-small">pt</span>`;
                     withdrawCourseName.textContent = details.name;
                     withdrawCourseIcon.className = `course-icon ${details.iconClass}`;
                     withdrawCourseIcon.textContent = details.iconText;
-                    
+
                     updateAvailablePointsDisplay();
                     withdrawPointsInput.value = "0";
                     updateWithdrawButtonsState();
                     validateWithdrawButton();
-                    
+
                     const backToWithdrawBtn = document.getElementById('backToDetailFromWithdraw');
                     backToWithdrawBtn.setAttribute('onclick', `showScreen('${currentCourseId}DetailScreen')`);
                 }
@@ -1667,7 +1790,7 @@
 
             // PayPayポイント運用タブが選択されたらQRコードを生成
             if (contentId === 'paypayLinkContent' && !ppPointQR.src) {
-                const deeplink = 'https://paypay.ne.jp/point-operation2/';
+                const deeplink = 'paypay://miniapp?appId=m_512cIsRNmu）';
                 ppPointQR.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(deeplink)}`;
             }
         }
@@ -1729,7 +1852,7 @@
                     `;
                 }
             });
-            
+
             // 投資状況サマリーも更新
             updateInvestmentSummary();
         }
@@ -1738,14 +1861,14 @@
         function getCurrentPrice(courseId) {
             const courseData = allCourseData[courseId];
             if (!courseData || courseData.length === 0) return 10000;
-            
+
             // currentDate以前の最新データを探す
             for (let i = courseData.length - 1; i >= 0; i--) {
                 if (courseData[i].date <= currentDate) {
                     return courseData[i].value;
                 }
             }
-            
+
             // 見つからない場合は最初のデータを返す
             return courseData[0].value;
         }
@@ -1759,11 +1882,11 @@
         function updateCurrentDateDisplay() {
             document.getElementById('currentDateText').textContent = formatDate(currentDate);
             document.getElementById('currentDateInOperation').textContent = formatDate(currentDate);
-            
+
             const maxDate = new Date(loginDate);
             maxDate.setFullYear(loginDate.getFullYear() + 1);
             document.getElementById('maxDateInOperation').textContent = formatDate(maxDate);
-            
+
             // 運用ボタンの有効/無効を更新
             updateAdvanceTimeButtons();
         }
@@ -1772,12 +1895,12 @@
         function updateAdvanceTimeButtons() {
             const maxDate = new Date(loginDate);
             maxDate.setFullYear(loginDate.getFullYear() + 1);
-            
+
             document.querySelectorAll('.advance-time-btn').forEach(btn => {
                 const months = parseInt(btn.dataset.months);
                 const futureDate = new Date(currentDate);
                 futureDate.setMonth(futureDate.getMonth() + months);
-                
+
                 if (futureDate > maxDate) {
                     btn.disabled = true;
                     btn.style.opacity = '0.5';
@@ -1793,7 +1916,7 @@
         // --- 運用履歴を追加する関数 ---
         function addTransactionHistory(type, courseId, points, date = null) {
             const transactionDate = date || new Date(currentDate);
-            
+
             // 同じ日の取引回数をカウント
             const sameDayTransactions = transactionHistory.filter(t => {
                 const tDate = new Date(t.date);
@@ -1802,7 +1925,7 @@
                        tDate.getDate() === transactionDate.getDate();
             });
             const dailyTransactionNumber = sameDayTransactions.length + 1;
-            
+
             const transaction = {
                 date: transactionDate,
                 type: type, // 'add' or 'withdraw'
@@ -1819,23 +1942,23 @@
         function updateHistoryDisplay() {
             const historyList = document.getElementById('historyList');
             const emptyHistory = document.getElementById('emptyHistory');
-            
+
             if (transactionHistory.length === 0) {
                 historyList.innerHTML = '';
                 emptyHistory.style.display = 'block';
                 return;
             }
-            
+
             emptyHistory.style.display = 'none';
-            
+
             // 新しい順に表示
             const sortedHistory = [...transactionHistory].reverse();
-            
+
             historyList.innerHTML = sortedHistory.map(transaction => {
                 const typeText = transaction.type === 'add' ? '追加' : '引き出し';
                 const typeColor = transaction.type === 'add' ? '#4CAF50' : '#FF4B4B';
                 const typeIcon = transaction.type === 'add' ? '+' : '-';
-                
+
                 return `
                     <div style="border-bottom: 1px solid #eee; padding: 15px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -1862,7 +1985,7 @@
         function updateInvestmentSummary() {
             let totalInvested = 0;
             let totalValue = 0;
-            
+
             Object.keys(userHoldings).forEach(courseId => {
                 const holding = userHoldings[courseId];
                 if (holding.invested > 0) {
@@ -1871,11 +1994,11 @@
                     totalValue += Math.round(holding.units * currentPrice);
                 }
             });
-            
+
             const totalProfit = totalValue - totalInvested;
             const profitSign = totalProfit >= 0 ? '+' : '';
             const profitColor = totalProfit >= 0 ? '#90EE90' : '#FFB6C1';
-            
+
             document.getElementById('totalInvested').textContent = totalInvested.toLocaleString() + 'pt';
             document.getElementById('totalValue').textContent = totalValue.toLocaleString() + 'pt';
             const totalProfitElement = document.getElementById('totalProfit');
@@ -1887,19 +2010,19 @@
         function updateCourseHoldingStatus(courseId) {
             const holding = userHoldings[courseId] || { invested: 0, units: 0 };
             const currentPrice = getCurrentPrice(courseId);
-            
+
             // 現在価格の表示
             const priceElement = document.getElementById(`${courseId}CurrentPrice`);
             if (priceElement) {
                 priceElement.textContent = `現在価格: ${Math.round(currentPrice).toLocaleString()}pt`;
             }
-            
+
             // 投資額の表示
             const investedElement = document.getElementById(`${courseId}Invested`);
             if (investedElement) {
                 investedElement.textContent = holding.invested.toLocaleString() + 'pt';
             }
-            
+
             // 評価額の表示
             let currentValue = 0;
             if (holding.invested > 0) {
@@ -1909,7 +2032,7 @@
             if (valueElement) {
                 valueElement.textContent = currentValue.toLocaleString() + 'pt';
             }
-            
+
             // 累計損益の表示
             const profit = currentValue - holding.invested;
             const profitElement = document.getElementById(`${courseId}Profit`);
@@ -1930,7 +2053,7 @@
                     if (detailScreen) {
                         const screenId = detailScreen.id;
                         const courseId = screenId.replace('DetailScreen', '');
-                        
+
                         if (courseId && courseDetails[courseId]) {
                             currentCourseId = courseId;
                             showScreen('withdrawScreen');
@@ -2153,7 +2276,7 @@
                 if (currentPrice > 0) {
                     const unitsToWithdraw = pointsWithdrawn / currentPrice;
                     userHoldings[currentCourseId].units -= unitsToWithdraw;
-                    
+
                     // unitsがほぼ0になったら、invested（元本）も0にリセット
                     if (userHoldings[currentCourseId].units < 0.0001) {
                         userHoldings[currentCourseId].units = 0;
@@ -2228,7 +2351,23 @@
         document.querySelectorAll('.advance-time-btn').forEach(button => {
             button.addEventListener('click', function() {
                 const months = parseInt(this.dataset.months);
-                advanceTime(months);
+                const monthsText = months === 12 ? '1年' : `${months}ヶ月`;
+
+                // 確認ダイアログを表示
+                const message = `本当に${monthsText}先まで時間を進めますか？\n\n` +
+                               `注意: 時間を進めると元に戻すことはできません。\n` +
+                               `各コースの価格が変動し、損益が発生する可能性があります。`;
+
+                if (confirm(message)) {
+                    // ローディング画面を表示
+                    showLoadingOverlay(months);
+
+                    // 5秒後に実際の処理を実行
+                    setTimeout(() => {
+                        advanceTime(months);
+                        hideLoadingOverlay();
+                    }, 5000);
+                }
             });
         });
 
@@ -2244,6 +2383,40 @@
             });
         });
 
+
+        // --- ローディング画面を表示する関数 ---
+        function showLoadingOverlay(months) {
+            const overlay = document.getElementById('loadingOverlay');
+            const periodText = document.getElementById('loadingPeriod');
+            const progressBar = document.getElementById('loadingProgressBar');
+
+            const monthsText = months === 12 ? '1年' : `${months}ヶ月`;
+            periodText.textContent = `${monthsText}後へ移動中`;
+
+            overlay.classList.add('active');
+
+            // プログレスバーのアニメーション
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 2;
+                progressBar.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                }
+            }, 100); // 5秒で100%になるように調整（50ms * 100 = 5000ms）
+        }
+
+        // --- ローディング画面を非表示にする関数 ---
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loadingOverlay');
+            const progressBar = document.getElementById('loadingProgressBar');
+
+            overlay.classList.remove('active');
+            // プログレスバーをリセット
+            setTimeout(() => {
+                progressBar.style.width = '0%';
+            }, 300);
+        }
 
         // --- 時間を進める関数 ---
         function advanceTime(months) {
