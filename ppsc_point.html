@@ -565,7 +565,7 @@
             <div style="font-size: 12px; color: #999;">少々お待ちください</div>
         </div>
     </div>
-
+    
     <div class="container">
 
         <div id="loginScreen" class="screen active">
@@ -613,6 +613,14 @@
                         </svg>
                         <span style="color: #1976d2; font-weight: bold; font-size: 14px;">現在の運用日: <span id="currentDateText">2024年6月30日</span></span>
                     </div>
+
+                    <div id="totalPointsChartContainer" class="chart-container" style="height: 200px; margin-bottom: 20px;">
+                        <canvas id="totalPointsChart"></canvas>
+                    </div>
+
+                    
+
+                    
 
                     <!-- 投資状況サマリー -->
                     <div id="investmentSummary" style="background: linear-gradient(135deg, #4285F4 0%, #6aa3ff 100%); color: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -719,7 +727,7 @@
                             最大で<strong id="maxDateInOperation">2025年6月30日</strong>まで運用可能です
                         </p>
                     </div>
-
+                    
                     <div id="advanceTimeButtons" style="display: flex; flex-direction: column; gap: 15px;">
                         <button class="button advance-time-btn" data-months="1" style="background: #9E9E9E; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
                             1ヶ月運用する
@@ -734,7 +742,7 @@
                             1年運用する
                         </button>
                     </div>
-
+                    
                     <div id="operationResult" style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px; display: none;">
                         <h4 style="color: #333; margin-bottom: 15px;">運用結果</h4>
                         <div id="operationDetails" style="color: #555;"></div>
@@ -748,7 +756,7 @@
                         PayPayアプリからかんたんに始められます。
                     </p>
                     <div style="margin: 20px 0;">
-                        <img id="ppPointQR" src="" alt="PayPayポイント運用 QRコード" style="width: 150px; height: 150px; border: 1px solid #ddd; padding: 5px;">
+                        <img id="ppPointQR" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZoAAAGaAQAAAAAefbjOAAAC9UlEQVR4nO2cW2rcQBBFT0UCf/bALMBLae0ga80OpKXMAgLSp6HFzUc/JHsCITiWnVHpQzNi+uAWFPW4VW0Tf31N3/6eAYcccsghhxxy6DEhK1cPk5kxmZkNi5nZZTVY6oLhU7bn0IEQkiSiJGnuBCFBnDtpDJJGKI/buvGLv5ND74H68rlcIP4AWJ4Ey2rEm6E4XxMsYNClw7fn0OFQ/+ZZsNq+Ig0vdlegfvF3cuifQtOlkw0h5W/FZXzIX3LoS0O7nAFg6es3wAZAUnoLHbc9h46GJjMzu4ANSw/QZc9gQ/59zaXGZ23PoaPziC0wiKXcmJ5fTCyrab/g2O059FlQUSF6mC4AIaGRTkzPqtawuI84A1T0COhEVAKCVFKIUIxBmsvN9YizQDmpLFKEWckxby29DJINoXmL/+KdHHpPHmFxvpLlynJ1qeQRpN7iCJou8/Hbc+hwqCpUIQHLNRF/XLNdWJxLQikAI6x18Rd/J4feA+U8QlJCY0g5U8iZZW5kbB2OUJd6HvHIUOt0lf7WlllqBKS50/7mFvHoUPUR1RUQlYodjJRWqEbcIk4D7XxEdgrZDpoJjLTCc+68G34CqGqWy1UWtfYQfppYLiZCwqLW3qBLltcdvD2HDod+4yNoTa4aJnKsqIvdRzw0tNcsSwO0BAeajrklGB41Hh+qFrHN0m0pxCZYtTaHW8TDQ80i1CYpN9to8jbe1zgN9EqhYpu3fVWMetQ4EVSE6en7LCPMWawW4acR57UvRcjNADrZ0dtz6HBoJ1bn51iDSFEv1TqewafzzwC1qFHzCKBUn0W9ZGclXn0+PsTODppSWTpdM9U2mlzpFvHw0N2ZrlaClgix9UNxheoMUMsj2B3my+4BXosSuEWcEbKhDthuxqA2PWHDJ2/PoQ+H3p7yY7p0idLa6pPFWw8sVxFvTz5neQLo/mw4ULPIMimR141efZ4Cuqs1tlgxhiJX1iU+MXMG6P7g958v/89kDjnkkEMOOeQQwC+S0r5uBYF0ygAAAABJRU5ErkJggg==" alt="PayPayポイント運用 QRコード" style="width: 150px; height: 150px; border: 1px solid #ddd; padding: 5px;">
                     </div>
                     <p style="font-size: 12px; color: #777;">↑ PayPayアプリで読み取ってください</p>
                     <a href="paypay://miniapp?appId=m_214669354616520704" target="_blank" class="button button-outline" style="text-decoration: none; display: inline-block; width: auto; padding: 10px 20px; margin-top: 10px;">
@@ -779,7 +787,7 @@
                     <button class="time-filter active" data-period="1Y">1年</button>
                     <button class="time-filter" data-period="5Y">5年</button>
                 </div>
-
+                
                 <!-- 保有状況セクション -->
                 <div id="goldHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -801,11 +809,11 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="course-description">
-                    <p><strong>連動するETF:</strong> SPDR®︎ゴールド・シェア（GLD）</p>
-                    <p><strong>コース概要:</strong> 金の価格に連動することを目指すコースです。金は一般的に、株式市場が不安定な時に「安全資産」として買われる傾向があります。ただし、金価格も様々な要因で変動するため、元本が保証されているわけではありません。</p>
-                    <p><strong>特徴:</strong> 他のコースと比較して、値動きが比較的穏やかとされていますが、世界経済や金融情勢の影響を受けます。</p>
+                    <p><strong>連動するETF:</strong>SPDRゴールド・シェア（GLD）</p>
+                    <p><strong>コース概要:</strong>金で運用するETFの価格に連動するコースです。株価の下落時に影響を受けにくいため、株式で構成されるコースのリスク回避を行いたい方に向いています。</p>
+                    <p><strong>特徴:</strong>他のコースと比較して、値動きが比較的穏やかとされていますが、世界経済や金融情勢の影響を受けます。</p>
                 </div>
                  <div class="button-container">
                     <button class="button button-blue add-points-button">ポイントを追加する</button>
@@ -834,7 +842,7 @@
                      <button class="time-filter active" data-period="1Y">1年</button>
                      <button class="time-filter" data-period="5Y">5年</button>
                  </div>
-
+                
                 <!-- 保有状況セクション -->
                 <div id="standardHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -856,11 +864,11 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="course-description">
-                    <p><strong>連動するETF:</strong> DIREXION S&P 500 3X（SPXL）</p>
-                    <p><strong>コース概要:</strong> アメリカの代表的な株価指数であるS&P500指数の一日の値動きの「3倍」の値動きを目指すコースです。大きなリターンが期待できる一方、相場が下がった場合には損失も大きくなる可能性があります。</p>
-                    <p><strong>特徴:</strong> ハイリスク・ハイリターンのコースです。市場の変動を積極的に捉えたい方向けですが、大きな価格変動リスクを伴います。</p>
+                    <p><strong>連動するETF:</strong>SPDR S&P500 ETF（SPY）</p>
+                    <p><strong>コース概要:</strong>アメリカを代表する企業500社に分散して運用するコースです。500銘柄への分散投資で個別銘柄よりも大きな変動は少ないため、長期運用に向いています。</p>
+                    <p><strong>特徴:</strong>ハイリスク・ハイリターンのコースです。市場の変動を積極的に捉えたい方向けですが、大きな価格変動リスクを伴います。</p>
                 </div>
                  <div class="button-container">
                     <button class="button button-blue add-points-button">ポイントを追加する</button>
@@ -889,7 +897,7 @@
                      <button class="time-filter active" data-period="1Y">1年</button>
                      <button class="time-filter" data-period="5Y">5年</button>
                  </div>
-
+                
                 <!-- 保有状況セクション -->
                 <div id="techHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -911,10 +919,10 @@
                         </div>
                     </div>
                 </div>
-
+                
                  <div class="course-description">
-                    <p><strong>連動するETF:</strong> DIREXION NASDAQ-100 3X（TQQQ）</p>
-                    <p><strong>コース概要:</strong> アメリカのナスダック100指数の一日の値動きの「3倍」の値動きを目指すコースです。ナスダック100はハイテク関連企業の比率が高い指数であり、その3倍の値動きを目指すため、非常に大きなリターンが期待できる一方、下落時のリスクも極めて大きくなります。</p>
+                    <p><strong>連動するETF:</strong>インべスコQQQ（QQQ）</p>
+                    <p><strong>コース概要:</strong>アメリカのナスダック市場に上場する企業の中で代表的な100社に分散して運用するコースです。アメリカを代表するテクノロジー企業に投資をしたい方に向いています。</p>
                     <p><strong>特徴:</strong> スタンダードコース以上にハイリスク・ハイリターンなコースです。テクノロジー株の成長に期待する方向けですが、非常に高い価格変動リスクを許容する必要があります。</p>
                 </div>
                  <div class="button-container">
@@ -944,7 +952,7 @@
                      <button class="time-filter active" data-period="1Y">1年</button>
                      <button class="time-filter" data-period="5Y">5年</button>
                  </div>
-
+                
                 <!-- 保有状況セクション -->
                 <div id="bitcoinHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -966,10 +974,10 @@
                         </div>
                     </div>
                 </div>
-
+                
                 <div class="course-description">
                     <p><strong>連動対象（想定）:</strong> ビットコイン価格</p>
-                    <p><strong>コース概要:</strong> 代表的な暗号資産（仮想通貨）であるビットコインの価格変動に連動することを目指すコースです（※このコースはシミュレーター上の架空のものです）。ビットコインは価格変動が非常に大きいことで知られています。</p>
+                    <p><strong>コース概要:</strong>代表的な暗号資産（仮想通貨）であるビットコインの価格変動に連動することを目指すコースです。ビットコインは価格変動が非常に大きいことで知られています。</p>
                     <p><strong>特徴:</strong> 極めてハイリスク・ハイリターンなコースです。短期間で大きな利益を得る可能性がある一方、急激な価格下落により大きな損失を被る可能性も非常に高いです。暗号資産市場の動向に大きく左右されます。</p>
                 </div>
                 <div class="button-container">
@@ -1266,6 +1274,7 @@
         let loginDate = new Date('2024-06-30'); // ログインした日時を保持（2024年6月30日に固定）
         let currentDate = new Date('2024-06-30'); // 現在のシミュレーション日付
         let transactionHistory = []; // 取引履歴 [{date: Date, type: 'add'|'withdraw', courseId: string, points: number}, ...]
+        let totalPointsHistory = []; // 全保有ポイントの履歴 [{date: Date, value: number}]
 
         // --- ここに手動で取得したデータを貼り付け ---
         // 例:
@@ -3470,171 +3479,187 @@ const embeddedData = {
     { date: "2024-12-29", value: 93881 },
     { date: "2024-12-30", value: 92268 },
     { date: "2024-12-31", value: 92131 },
-    { date: "2025-01-01", value: 91949 },
-    { date: "2025-01-02", value: 92094 },
-    { date: "2025-01-03", value: 93083 },
-    { date: "2025-01-04", value: 93083 },
-    { date: "2025-01-05", value: 93083 },
-    { date: "2025-01-06", value: 93841 },
-    { date: "2025-01-07", value: 93027 },
-    { date: "2025-01-08", value: 93319 },
-    { date: "2025-01-09", value: 93195 },
-    { date: "2025-01-10", value: 91537 },
-    { date: "2025-01-11", value: 91537 },
-    { date: "2025-01-12", value: 91537 },
-    { date: "2025-01-13", value: 91561 },
-    { date: "2025-01-14", value: 91969 },
-    { date: "2025-01-15", value: 92748 },
-    { date: "2025-01-16", value: 91771 },
-    { date: "2025-01-17", value: 93411 },
-    { date: "2025-01-18", value: 93411 },
-    { date: "2025-01-19", value: 93411 },
-    { date: "2025-01-20", value: 92987 },
-    { date: "2025-01-21", value: 93692 },
-    { date: "2025-01-22", value: 94896 },
-    { date: "2025-01-23", value: 95133 },
-    { date: "2025-01-24", value: 94826 },
-    { date: "2025-01-25", value: 94826 },
-    { date: "2025-01-26", value: 94826 },
-    { date: "2025-01-27", value: 92612 },
-    { date: "2025-01-28", value: 94018 },
-    { date: "2025-01-29", value: 93387 },
-    { date: "2025-01-30", value: 93322 },
-    { date: "2025-01-31", value: 93412 },
-    { date: "2025-02-01", value: 93412 },
-    { date: "2025-02-02", value: 93412 },
-    { date: "2025-02-03", value: 92474 },
-    { date: "2025-02-04", value: 92868 },
-    { date: "2025-02-05", value: 92201 },
-    { date: "2025-02-06", value: 91807 },
-    { date: "2025-02-07", value: 90961 },
-    { date: "2025-02-08", value: 90961 },
-    { date: "2025-02-09", value: 90961 },
-    { date: "2025-02-10", value: 91933 },
-    { date: "2025-02-11", value: 92270 },
-    { date: "2025-02-12", value: 93152 },
-    { date: "2025-02-13", value: 93156 },
-    { date: "2025-02-14", value: 92873 },
-    { date: "2025-02-15", value: 92873 },
-    { date: "2025-02-16", value: 92873 },
-    { date: "2025-02-17", value: 92367 },
-    { date: "2025-02-18", value: 92947 },
-    { date: "2025-02-19", value: 92839 },
-    { date: "2025-02-20", value: 91324 },
-    { date: "2025-02-21", value: 89583 },
-    { date: "2025-02-22", value: 89583 },
-    { date: "2025-02-23", value: 89583 },
-    { date: "2025-02-24", value: 89411 },
-    { date: "2025-02-25", value: 88566 },
-    { date: "2025-02-26", value: 88613 },
-    { date: "2025-02-27", value: 87645 },
-    { date: "2025-02-28", value: 89436 },
-    { date: "2025-03-01", value: 89436 },
-    { date: "2025-03-02", value: 89436 },
-    { date: "2025-03-03", value: 87312 },
-    { date: "2025-03-04", value: 86377 },
-    { date: "2025-03-05", value: 86768 },
-    { date: "2025-03-06", value: 84732 },
-    { date: "2025-03-07", value: 85239 },
-    { date: "2025-03-08", value: 85239 },
-    { date: "2025-03-09", value: 85239 },
-    { date: "2025-03-10", value: 82576 },
+    { date: "2025-01-01", value: 92248 },
+    { date: "2025-01-02", value: 92170 },
+    { date: "2025-01-03", value: 93130 },
+    { date: "2025-01-04", value: 93130 },
+    { date: "2025-01-05", value: 93130 },
+    { date: "2025-01-06", value: 93871 },
+    { date: "2025-01-07", value: 92944 },
+    { date: "2025-01-08", value: 93336 },
+    { date: "2025-01-09", value: 93336 },
+    { date: "2025-01-10", value: 91624 },
+    { date: "2025-01-11", value: 91624 },
+    { date: "2025-01-12", value: 91624 },
+    { date: "2025-01-13", value: 91671 },
+    { date: "2025-01-14", value: 91998 },
+    { date: "2025-01-15", value: 92765 },
+    { date: "2025-01-16", value: 91841 },
+    { date: "2025-01-17", value: 93333 },
+    { date: "2025-01-18", value: 93333 },
+    { date: "2025-01-19", value: 93333 },
+    { date: "2025-01-20", value: 93333 },
+    { date: "2025-01-21", value: 93715 },
+    { date: "2025-01-22", value: 94920 },
+    { date: "2025-01-23", value: 95102 },
+    { date: "2025-01-24", value: 94790 },
+    { date: "2025-01-25", value: 94790 },
+    { date: "2025-01-26", value: 94790 },
+    { date: "2025-01-27", value: 92672 },
+    { date: "2025-01-28", value: 94024 },
+    { date: "2025-01-29", value: 93489 },
+    { date: "2025-01-30", value: 93310 },
+    { date: "2025-01-31", value: 93363 },
+    { date: "2025-02-01", value: 93363 },
+    { date: "2025-02-02", value: 93363 },
+    { date: "2025-02-03", value: 92456 },
+    { date: "2025-02-04", value: 92831 },
+    { date: "2025-02-05", value: 92261 },
+    { date: "2025-02-06", value: 91862 },
+    { date: "2025-02-07", value: 90906 },
+    { date: "2025-02-08", value: 90906 },
+    { date: "2025-02-09", value: 90906 },
+    { date: "2025-02-10", value: 91914 },
+    { date: "2025-02-11", value: 92324 },
+    { date: "2025-02-12", value: 93170 },
+    { date: "2025-02-13", value: 93131 },
+    { date: "2025-02-14", value: 92878 },
+    { date: "2025-02-15", value: 92878 },
+    { date: "2025-02-16", value: 92878 },
+    { date: "2025-02-17", value: 92878 },
+    { date: "2025-02-18", value: 92934 },
+    { date: "2025-02-19", value: 92845 },
+    { date: "2025-02-20", value: 91341 },
+    { date: "2025-02-21", value: 89492 },
+    { date: "2025-02-22", value: 89492 },
+    { date: "2025-02-23", value: 89492 },
+    { date: "2025-02-24", value: 89423 },
+    { date: "2025-02-25", value: 88530 },
+    { date: "2025-02-26", value: 88583 },
+    { date: "2025-02-27", value: 87586 },
+    { date: "2025-02-28", value: 89388 },
+    { date: "2025-03-01", value: 89388 },
+    { date: "2025-03-02", value: 89388 },
+    { date: "2025-03-03", value: 87271 },
+    { date: "2025-03-04", value: 85973 },
+    { date: "2025-03-05", value: 86767 },
+    { date: "2025-03-06", value: 84657 },
+    { date: "2025-03-07", value: 85215 },
+    { date: "2025-03-08", value: 85215 },
+    { date: "2025-03-09", value: 85215 },
+    { date: "2025-03-10", value: 82592 },
     { date: "2025-03-11", value: 82188 },
-    { date: "2025-03-12", value: 82863 },
-    { date: "2025-03-13", value: 81512 },
-    { date: "2025-03-14", value: 83646 },
-    { date: "2025-03-15", value: 83646 },
-    { date: "2025-03-16", value: 83646 },
-    { date: "2025-03-17", value: 84611 },
-    { date: "2025-03-18", value: 83726 },
-    { date: "2025-03-19", value: 84305 },
-    { date: "2025-03-20", value: 84150 },
-    { date: "2025-03-21", value: 84256 },
-    { date: "2025-03-22", value: 84256 },
-    { date: "2025-03-23", value: 84256 },
-    { date: "2025-03-24", value: 86511 },
-    { date: "2025-03-25", value: 86251 },
-    { date: "2025-03-26", value: 85676 },
+    { date: "2025-03-12", value: 82924 },
+    { date: "2025-03-13", value: 81456 },
+    { date: "2025-03-14", value: 83663 },
+    { date: "2025-03-15", value: 83663 },
+    { date: "2025-03-16", value: 83663 },
+    { date: "2025-03-17", value: 84582 },
+    { date: "2025-03-18", value: 83748 },
+    { date: "2025-03-19", value: 84406 },
+    { date: "2025-03-20", value: 84155 },
+    { date: "2025-03-21", value: 84278 },
+    { date: "2025-03-22", value: 84278 },
+    { date: "2025-03-23", value: 84278 },
+    { date: "2025-03-24", value: 86488 },
+    { date: "2025-03-25", value: 86233 },
+    { date: "2025-03-26", value: 85675 },
     { date: "2025-03-27", value: 85612 },
-    { date: "2025-03-28", value: 83251 },
-    { date: "2025-03-29", value: 83251 },
-    { date: "2025-03-30", value: 83251 },
+    { date: "2025-03-28", value: 83234 },
+    { date: "2025-03-29", value: 83234 },
+    { date: "2025-03-30", value: 83234 },
     { date: "2025-03-31", value: 83792 },
-    { date: "2025-04-01", value: 83952 },
-    { date: "2025-04-02", value: 84271 },
-    { date: "2025-04-03", value: 78485 },
-    { date: "2025-04-04", value: 74314 },
-    { date: "2025-04-05", value: 74314 },
-    { date: "2025-04-06", value: 74314 },
-    { date: "2025-04-07", value: 74606 },
-    { date: "2025-04-08", value: 72694 },
-    { date: "2025-04-09", value: 80228 },
-    { date: "2025-04-10", value: 75807 },
-    { date: "2025-04-11", value: 76636 },
-    { date: "2025-04-12", value: 76636 },
-    { date: "2025-04-13", value: 76636 },
-    { date: "2025-04-14", value: 77025 },
-    { date: "2025-04-15", value: 77026 },
-    { date: "2025-04-16", value: 74576 },
-    { date: "2025-04-17", value: 74995 },
-    { date: "2025-04-18", value: 74868 },
-    { date: "2025-04-19", value: 74868 },
-    { date: "2025-04-20", value: 74868 },
-    { date: "2025-04-21", value: 72467 },
-    { date: "2025-04-22", value: 74609 },
-    { date: "2025-04-23", value: 76805 },
-    { date: "2025-04-24", value: 77959 },
-    { date: "2025-04-25", value: 79120 },
-    { date: "2025-04-26", value: 79120 },
-    { date: "2025-04-27", value: 79120 },
-    { date: "2025-04-28", value: 78263 },
-    { date: "2025-04-29", value: 78893 },
-    { date: "2025-04-30", value: 79302 },
-    { date: "2025-05-01", value: 81224 },
-    { date: "2025-05-02", value: 82155 },
-    { date: "2025-05-03", value: 82155 },
-    { date: "2025-05-04", value: 82155 },
-    { date: "2025-05-05", value: 80939 },
-    { date: "2025-05-06", value: 79584 },
-    { date: "2025-05-07", value: 80710 },
+    { date: "2025-04-01", value: 83963 },
+    { date: "2025-04-02", value: 84734 },
+    { date: "2025-04-03", value: 78586 },
+    { date: "2025-04-04", value: 74288 },
+    { date: "2025-04-05", value: 74288 },
+    { date: "2025-04-06", value: 74288 },
+    { date: "2025-04-07", value: 74686 },
+    { date: "2025-04-08", value: 72714 },
+    { date: "2025-04-09", value: 80358 },
+    { date: "2025-04-10", value: 75938 },
+    { date: "2025-04-11", value: 76689 },
+    { date: "2025-04-12", value: 76689 },
+    { date: "2025-04-13", value: 76689 },
+    { date: "2025-04-14", value: 77051 },
+    { date: "2025-04-15", value: 77020 },
+    { date: "2025-04-16", value: 74723 },
+    { date: "2025-04-17", value: 74994 },
+    { date: "2025-04-18", value: 74994 },
+    { date: "2025-04-19", value: 74994 },
+    { date: "2025-04-20", value: 74994 },
+    { date: "2025-04-21", value: 72482 },
+    { date: "2025-04-22", value: 74625 },
+    { date: "2025-04-23", value: 76783 },
+    { date: "2025-04-24", value: 77996 },
+    { date: "2025-04-25", value: 79097 },
+    { date: "2025-04-26", value: 79097 },
+    { date: "2025-04-27", value: 79097 },
+    { date: "2025-04-28", value: 78296 },
+    { date: "2025-04-29", value: 78870 },
+    { date: "2025-04-30", value: 79230 },
+    { date: "2025-05-01", value: 81279 },
+    { date: "2025-05-02", value: 82188 },
+    { date: "2025-05-03", value: 82188 },
+    { date: "2025-05-04", value: 82188 },
+    { date: "2025-05-05", value: 80972 },
+    { date: "2025-05-06", value: 79567 },
+    { date: "2025-05-07", value: 80715 },
     { date: "2025-05-08", value: 82407 },
-    { date: "2025-05-09", value: 82015 },
-    { date: "2025-05-10", value: 82015 },
-    { date: "2025-05-11", value: 82015 },
-    { date: "2025-05-12", value: 86542 },
-    { date: "2025-05-13", value: 86535 },
-    { date: "2025-05-14", value: 86210 },
-    { date: "2025-05-15", value: 86007 },
-    { date: "2025-05-16", value: 86568 },
-    { date: "2025-05-17", value: 86568 },
-    { date: "2025-05-18", value: 86568 },
-    { date: "2025-05-19", value: 86208 },
-    { date: "2025-05-20", value: 85667 },
-    { date: "2025-05-21", value: 83787 },
-    { date: "2025-05-22", value: 83909 },
-    { date: "2025-05-23", value: 82589 },
-    { date: "2025-05-24", value: 82589 },
-    { date: "2025-05-25", value: 82589 },
-    { date: "2025-05-26", value: 82752 },
+    { date: "2025-05-09", value: 81986 },
+    { date: "2025-05-10", value: 81986 },
+    { date: "2025-05-11", value: 81986 },
+    { date: "2025-05-12", value: 86512 },
+    { date: "2025-05-13", value: 86517 },
+    { date: "2025-05-14", value: 86245 },
+    { date: "2025-05-15", value: 85983 },
+    { date: "2025-05-16", value: 86770 },
+    { date: "2025-05-17", value: 86770 },
+    { date: "2025-05-18", value: 86770 },
+    { date: "2025-05-19", value: 86207 },
+    { date: "2025-05-20", value: 85690 },
+    { date: "2025-05-21", value: 83792 },
+    { date: "2025-05-22", value: 83914 },
+    { date: "2025-05-23", value: 82560 },
+    { date: "2025-05-24", value: 82560 },
+    { date: "2025-05-25", value: 82560 },
+    { date: "2025-05-26", value: 82560 },
     { date: "2025-05-27", value: 85309 },
-    { date: "2025-05-28", value: 85144 },
-    { date: "2025-05-29", value: 85081 },
-    { date: "2025-05-30", value: 84908 },
-    { date: "2025-05-31", value: 84908 },
-    { date: "2025-06-01", value: 84908 },
-    { date: "2025-06-02", value: 84589 },
-    { date: "2025-06-03", value: 85844 },
-    { date: "2025-06-04", value: 85102 },
-    { date: "2025-06-05", value: 85142 },
-    { date: "2025-06-06", value: 86783 },
-    { date: "2025-06-07", value: 86783 },
-    { date: "2025-06-08", value: 86675 },
-    { date: "2025-06-09", value: 86688 },
-    { date: "2025-06-10", value: 87371 },
-    { date: "2025-06-11", value: 86957 },
-    { date: "2025-06-12", value: 86625 },
-    { date: "2025-06-13", value: 86028 },
-    { date: "2025-06-14", value: 86028 }
+    { date: "2025-05-28", value: 85191 },
+    { date: "2025-05-29", value: 85045 },
+    { date: "2025-05-30", value: 84807 },
+    { date: "2025-05-31", value: 84807 },
+    { date: "2025-06-01", value: 84807 },
+    { date: "2025-06-02", value: 84588 },
+    { date: "2025-06-03", value: 85886 },
+    { date: "2025-06-04", value: 85179 },
+    { date: "2025-06-05", value: 85231 },
+    { date: "2025-06-06", value: 86735 },
+    { date: "2025-06-07", value: 86735 },
+    { date: "2025-06-08", value: 86735 },
+    { date: "2025-06-09", value: 86663 },
+    { date: "2025-06-10", value: 87407 },
+    { date: "2025-06-11", value: 87011 },
+    { date: "2025-06-12", value: 86673 },
+    { date: "2025-06-13", value: 85938 },
+    { date: "2025-06-14", value: 85938 },
+    { date: "2025-06-15", value: 85938 },
+    { date: "2025-06-16", value: 87314 },
+    { date: "2025-06-17", value: 86783 },
+    { date: "2025-06-18", value: 86693 },
+    { date: "2025-06-19", value: 86693 },
+    { date: "2025-06-20", value: 86918 },
+    { date: "2025-06-21", value: 86918 },
+    { date: "2025-06-22", value: 86918 },
+    { date: "2025-06-23", value: 87695 },
+    { date: "2025-06-24", value: 87868 },
+    { date: "2025-06-25", value: 88183 },
+    { date: "2025-06-26", value: 88331 },
+    { date: "2025-06-27", value: 89002 },
+    { date: "2025-06-28", value: 89002 },
+    { date: "2025-06-29", value: 89002 },
+    { date: "2025-06-30", value: 89012 }
   ],
   tech: [
     { date: "2019-01-01", value: 16924 },
@@ -5830,171 +5855,187 @@ const embeddedData = {
     { date: "2024-12-29", value: 82459 },
     { date: "2024-12-30", value: 80871 },
     { date: "2024-12-31", value: 80372 },
-    { date: "2025-01-01", value: 80214 },
-    { date: "2025-01-02", value: 80365 },
-    { date: "2025-01-03", value: 81557 },
-    { date: "2025-01-04", value: 81557 },
-    { date: "2025-01-05", value: 81557 },
-    { date: "2025-01-06", value: 82675 },
-    { date: "2025-01-07", value: 81413 },
-    { date: "2025-01-08", value: 81585 },
-    { date: "2025-01-09", value: 81477 },
-    { date: "2025-01-10", value: 79979 },
-    { date: "2025-01-11", value: 79979 },
-    { date: "2025-01-12", value: 79979 },
-    { date: "2025-01-13", value: 79622 },
-    { date: "2025-01-14", value: 79781 },
-    { date: "2025-01-15", value: 80834 },
-    { date: "2025-01-16", value: 79584 },
-    { date: "2025-01-17", value: 81546 },
-    { date: "2025-01-18", value: 81546 },
-    { date: "2025-01-19", value: 81546 },
-    { date: "2025-01-20", value: 81176 },
-    { date: "2025-01-21", value: 81558 },
-    { date: "2025-01-22", value: 83196 },
-    { date: "2025-01-23", value: 83129 },
-    { date: "2025-01-24", value: 82612 },
-    { date: "2025-01-25", value: 82612 },
-    { date: "2025-01-26", value: 82612 },
-    { date: "2025-01-27", value: 79425 },
-    { date: "2025-01-28", value: 81171 },
-    { date: "2025-01-29", value: 80818 },
-    { date: "2025-01-30", value: 80688 },
-    { date: "2025-01-31", value: 81054 },
-    { date: "2025-02-01", value: 81054 },
-    { date: "2025-02-02", value: 81054 },
-    { date: "2025-02-03", value: 80173 },
-    { date: "2025-02-04", value: 80955 },
-    { date: "2025-02-05", value: 80396 },
-    { date: "2025-02-06", value: 80203 },
-    { date: "2025-02-07", value: 79178 },
-    { date: "2025-02-08", value: 79178 },
-    { date: "2025-02-09", value: 79178 },
-    { date: "2025-02-10", value: 80450 },
-    { date: "2025-02-11", value: 80488 },
-    { date: "2025-02-12", value: 81577 },
-    { date: "2025-02-13", value: 81882 },
-    { date: "2025-02-14", value: 81974 },
-    { date: "2025-02-15", value: 81974 },
-    { date: "2025-02-16", value: 81974 },
-    { date: "2025-02-17", value: 81527 },
-    { date: "2025-02-18", value: 81993 },
-    { date: "2025-02-19", value: 81733 },
-    { date: "2025-02-20", value: 80366 },
-    { date: "2025-02-21", value: 78556 },
-    { date: "2025-02-22", value: 78556 },
-    { date: "2025-02-23", value: 78556 },
-    { date: "2025-02-24", value: 77839 },
-    { date: "2025-02-25", value: 76510 },
-    { date: "2025-02-26", value: 76693 },
-    { date: "2025-02-27", value: 74957 },
-    { date: "2025-02-28", value: 76512 },
-    { date: "2025-03-01", value: 76512 },
-    { date: "2025-03-02", value: 76512 },
-    { date: "2025-03-03", value: 74360 },
-    { date: "2025-03-04", value: 74209 },
+    { date: "2025-01-01", value: 80474 },
+    { date: "2025-01-02", value: 80431 },
+    { date: "2025-01-03", value: 81598 },
+    { date: "2025-01-04", value: 81598 },
+    { date: "2025-01-05", value: 81598 },
+    { date: "2025-01-06", value: 82701 },
+    { date: "2025-01-07", value: 81341 },
+    { date: "2025-01-08", value: 81600 },
+    { date: "2025-01-09", value: 81600 },
+    { date: "2025-01-10", value: 80054 },
+    { date: "2025-01-11", value: 80054 },
+    { date: "2025-01-12", value: 80054 },
+    { date: "2025-01-13", value: 79717 },
+    { date: "2025-01-14", value: 79806 },
+    { date: "2025-01-15", value: 80849 },
+    { date: "2025-01-16", value: 79645 },
+    { date: "2025-01-17", value: 81478 },
+    { date: "2025-01-18", value: 81478 },
+    { date: "2025-01-19", value: 81478 },
+    { date: "2025-01-20", value: 81478 },
+    { date: "2025-01-21", value: 81579 },
+    { date: "2025-01-22", value: 83216 },
+    { date: "2025-01-23", value: 83102 },
+    { date: "2025-01-24", value: 82579 },
+    { date: "2025-01-25", value: 82579 },
+    { date: "2025-01-26", value: 82579 },
+    { date: "2025-01-27", value: 79476 },
+    { date: "2025-01-28", value: 81175 },
+    { date: "2025-01-29", value: 80906 },
+    { date: "2025-01-30", value: 80677 },
+    { date: "2025-01-31", value: 81011 },
+    { date: "2025-02-01", value: 81011 },
+    { date: "2025-02-02", value: 81011 },
+    { date: "2025-02-03", value: 80157 },
+    { date: "2025-02-04", value: 80923 },
+    { date: "2025-02-05", value: 80448 },
+    { date: "2025-02-06", value: 80250 },
+    { date: "2025-02-07", value: 79130 },
+    { date: "2025-02-08", value: 79130 },
+    { date: "2025-02-09", value: 79130 },
+    { date: "2025-02-10", value: 80433 },
+    { date: "2025-02-11", value: 80535 },
+    { date: "2025-02-12", value: 81592 },
+    { date: "2025-02-13", value: 81860 },
+    { date: "2025-02-14", value: 81979 },
+    { date: "2025-02-15", value: 81979 },
+    { date: "2025-02-16", value: 81979 },
+    { date: "2025-02-17", value: 81979 },
+    { date: "2025-02-18", value: 81982 },
+    { date: "2025-02-19", value: 81738 },
+    { date: "2025-02-20", value: 80382 },
+    { date: "2025-02-21", value: 78477 },
+    { date: "2025-02-22", value: 78477 },
+    { date: "2025-02-23", value: 78477 },
+    { date: "2025-02-24", value: 77849 },
+    { date: "2025-02-25", value: 76479 },
+    { date: "2025-02-26", value: 76667 },
+    { date: "2025-02-27", value: 74906 },
+    { date: "2025-02-28", value: 76471 },
+    { date: "2025-03-01", value: 76471 },
+    { date: "2025-03-02", value: 76471 },
+    { date: "2025-03-03", value: 74324 },
+    { date: "2025-03-04", value: 73862 },
     { date: "2025-03-05", value: 74730 },
-    { date: "2025-03-06", value: 72247 },
-    { date: "2025-03-07", value: 72796 },
-    { date: "2025-03-08", value: 72796 },
-    { date: "2025-03-09", value: 72796 },
-    { date: "2025-03-10", value: 69687 },
+    { date: "2025-03-06", value: 72183 },
+    { date: "2025-03-07", value: 72776 },
+    { date: "2025-03-08", value: 72776 },
+    { date: "2025-03-09", value: 72776 },
+    { date: "2025-03-10", value: 69701 },
     { date: "2025-03-11", value: 69709 },
-    { date: "2025-03-12", value: 70732 },
-    { date: "2025-03-13", value: 69227 },
-    { date: "2025-03-14", value: 71290 },
-    { date: "2025-03-15", value: 71290 },
-    { date: "2025-03-16", value: 71290 },
-    { date: "2025-03-17", value: 72035 },
-    { date: "2025-03-18", value: 70857 },
-    { date: "2025-03-19", value: 71497 },
-    { date: "2025-03-20", value: 71300 },
-    { date: "2025-03-21", value: 71833 },
-    { date: "2025-03-22", value: 71833 },
-    { date: "2025-03-23", value: 71833 },
-    { date: "2025-03-24", value: 73915 },
-    { date: "2025-03-25", value: 73968 },
-    { date: "2025-03-26", value: 72967 },
-    { date: "2025-03-27", value: 72711 },
-    { date: "2025-03-28", value: 70247 },
-    { date: "2025-03-29", value: 70247 },
-    { date: "2025-03-30", value: 70247 },
+    { date: "2025-03-12", value: 70784 },
+    { date: "2025-03-13", value: 69179 },
+    { date: "2025-03-14", value: 71304 },
+    { date: "2025-03-15", value: 71304 },
+    { date: "2025-03-16", value: 71304 },
+    { date: "2025-03-17", value: 72010 },
+    { date: "2025-03-18", value: 70875 },
+    { date: "2025-03-19", value: 71583 },
+    { date: "2025-03-20", value: 71304 },
+    { date: "2025-03-21", value: 71852 },
+    { date: "2025-03-22", value: 71852 },
+    { date: "2025-03-23", value: 71852 },
+    { date: "2025-03-24", value: 73895 },
+    { date: "2025-03-25", value: 73953 },
+    { date: "2025-03-26", value: 72966 },
+    { date: "2025-03-27", value: 72710 },
+    { date: "2025-03-28", value: 70233 },
+    { date: "2025-03-29", value: 70233 },
+    { date: "2025-03-30", value: 70233 },
     { date: "2025-03-31", value: 70265 },
-    { date: "2025-04-01", value: 70731 },
-    { date: "2025-04-02", value: 71067 },
-    { date: "2025-04-03", value: 65794 },
-    { date: "2025-04-04", value: 62219 },
-    { date: "2025-04-05", value: 62219 },
-    { date: "2025-04-06", value: 62219 },
-    { date: "2025-04-07", value: 62697 },
-    { date: "2025-04-08", value: 60893 },
-    { date: "2025-04-09", value: 68696 },
-    { date: "2025-04-10", value: 64465 },
-    { date: "2025-04-11", value: 65212 },
-    { date: "2025-04-12", value: 65212 },
-    { date: "2025-04-13", value: 65212 },
-    { date: "2025-04-14", value: 65363 },
-    { date: "2025-04-15", value: 65608 },
-    { date: "2025-04-16", value: 63015 },
-    { date: "2025-04-17", value: 63259 },
-    { date: "2025-04-18", value: 63152 },
-    { date: "2025-04-19", value: 63152 },
-    { date: "2025-04-20", value: 63152 },
-    { date: "2025-04-21", value: 61073 },
-    { date: "2025-04-22", value: 62928 },
-    { date: "2025-04-23", value: 65174 },
-    { date: "2025-04-24", value: 66645 },
-    { date: "2025-04-25", value: 67908 },
-    { date: "2025-04-26", value: 67908 },
-    { date: "2025-04-27", value: 67908 },
-    { date: "2025-04-28", value: 67108 },
-    { date: "2025-04-29", value: 67675 },
-    { date: "2025-04-30", value: 68036 },
-    { date: "2025-05-01", value: 69983 },
-    { date: "2025-05-02", value: 70869 },
-    { date: "2025-05-03", value: 70869 },
-    { date: "2025-05-04", value: 70869 },
-    { date: "2025-05-05", value: 69800 },
-    { date: "2025-05-06", value: 68566 },
-    { date: "2025-05-07", value: 69508 },
+    { date: "2025-04-01", value: 70740 },
+    { date: "2025-04-02", value: 71457 },
+    { date: "2025-04-03", value: 65879 },
+    { date: "2025-04-04", value: 62198 },
+    { date: "2025-04-05", value: 62198 },
+    { date: "2025-04-06", value: 62198 },
+    { date: "2025-04-07", value: 62765 },
+    { date: "2025-04-08", value: 60910 },
+    { date: "2025-04-09", value: 68807 },
+    { date: "2025-04-10", value: 64576 },
+    { date: "2025-04-11", value: 65257 },
+    { date: "2025-04-12", value: 65257 },
+    { date: "2025-04-13", value: 65257 },
+    { date: "2025-04-14", value: 65386 },
+    { date: "2025-04-15", value: 65603 },
+    { date: "2025-04-16", value: 63139 },
+    { date: "2025-04-17", value: 63258 },
+    { date: "2025-04-18", value: 63258 },
+    { date: "2025-04-19", value: 63258 },
+    { date: "2025-04-20", value: 63258 },
+    { date: "2025-04-21", value: 61085 },
+    { date: "2025-04-22", value: 62941 },
+    { date: "2025-04-23", value: 65155 },
+    { date: "2025-04-24", value: 66678 },
+    { date: "2025-04-25", value: 67889 },
+    { date: "2025-04-26", value: 67889 },
+    { date: "2025-04-27", value: 67889 },
+    { date: "2025-04-28", value: 67136 },
+    { date: "2025-04-29", value: 67656 },
+    { date: "2025-04-30", value: 67973 },
+    { date: "2025-05-01", value: 70030 },
+    { date: "2025-05-02", value: 70898 },
+    { date: "2025-05-03", value: 70898 },
+    { date: "2025-05-04", value: 70898 },
+    { date: "2025-05-05", value: 69829 },
+    { date: "2025-05-06", value: 68551 },
+    { date: "2025-05-07", value: 69513 },
     { date: "2025-05-08", value: 71233 },
-    { date: "2025-05-09", value: 70936 },
-    { date: "2025-05-10", value: 70936 },
-    { date: "2025-05-11", value: 70936 },
-    { date: "2025-05-12", value: 75389 },
-    { date: "2025-05-13", value: 76036 },
-    { date: "2025-05-14", value: 76108 },
-    { date: "2025-05-15", value: 75644 },
-    { date: "2025-05-16", value: 75965 },
-    { date: "2025-05-17", value: 75965 },
-    { date: "2025-05-18", value: 75965 },
-    { date: "2025-05-19", value: 75636 },
-    { date: "2025-05-20", value: 75183 },
-    { date: "2025-05-21", value: 73740 },
-    { date: "2025-05-22", value: 73981 },
-    { date: "2025-05-23", value: 72615 },
-    { date: "2025-05-24", value: 72615 },
-    { date: "2025-05-25", value: 72615 },
-    { date: "2025-05-26", value: 72758 },
-    { date: "2025-05-27", value: 75235 },
-    { date: "2025-05-28", value: 75184 },
-    { date: "2025-05-29", value: 74982 },
-    { date: "2025-05-30", value: 74784 },
-    { date: "2025-05-31", value: 74784 },
-    { date: "2025-06-01", value: 74784 },
-    { date: "2025-06-02", value: 74687 },
-    { date: "2025-06-03", value: 75954 },
-    { date: "2025-06-04", value: 75510 },
-    { date: "2025-06-05", value: 75338 },
-    { date: "2025-06-06", value: 76764 },
-    { date: "2025-06-07", value: 76764 },
-    { date: "2025-06-08", value: 76669 },
-    { date: "2025-06-09", value: 76733 },
-    { date: "2025-06-10", value: 77403 },
-    { date: "2025-06-11", value: 76976 },
-    { date: "2025-06-12", value: 76576 },
-    { date: "2025-06-13", value: 75926 },
-    { date: "2025-06-14", value: 75926 }
+    { date: "2025-05-09", value: 70911 },
+    { date: "2025-05-10", value: 70911 },
+    { date: "2025-05-11", value: 70911 },
+    { date: "2025-05-12", value: 75364 },
+    { date: "2025-05-13", value: 76020 },
+    { date: "2025-05-14", value: 76139 },
+    { date: "2025-05-15", value: 75622 },
+    { date: "2025-05-16", value: 76142 },
+    { date: "2025-05-17", value: 76142 },
+    { date: "2025-05-18", value: 76142 },
+    { date: "2025-05-19", value: 75635 },
+    { date: "2025-05-20", value: 75203 },
+    { date: "2025-05-21", value: 73744 },
+    { date: "2025-05-22", value: 73985 },
+    { date: "2025-05-23", value: 72589 },
+    { date: "2025-05-24", value: 72589 },
+    { date: "2025-05-25", value: 72589 },
+    { date: "2025-05-26", value: 72589 },
+    { date: "2025-05-27", value: 75234 },
+    { date: "2025-05-28", value: 75225 },
+    { date: "2025-05-29", value: 74950 },
+    { date: "2025-05-30", value: 74696 },
+    { date: "2025-05-31", value: 74696 },
+    { date: "2025-06-01", value: 74696 },
+    { date: "2025-06-02", value: 74686 },
+    { date: "2025-06-03", value: 75990 },
+    { date: "2025-06-04", value: 75578 },
+    { date: "2025-06-05", value: 75416 },
+    { date: "2025-06-06", value: 76722 },
+    { date: "2025-06-07", value: 76722 },
+    { date: "2025-06-08", value: 76722 },
+    { date: "2025-06-09", value: 76711 },
+    { date: "2025-06-10", value: 77435 },
+    { date: "2025-06-11", value: 77023 },
+    { date: "2025-06-12", value: 76618 },
+    { date: "2025-06-13", value: 75847 },
+    { date: "2025-06-14", value: 75847 },
+    { date: "2025-06-15", value: 75847 },
+    { date: "2025-06-16", value: 77399 },
+    { date: "2025-06-17", value: 76819 },
+    { date: "2025-06-18", value: 76761 },
+    { date: "2025-06-19", value: 76761 },
+    { date: "2025-06-20", value: 77040 },
+    { date: "2025-06-21", value: 77040 },
+    { date: "2025-06-22", value: 77040 },
+    { date: "2025-06-23", value: 77702 },
+    { date: "2025-06-24", value: 78164 },
+    { date: "2025-06-25", value: 78603 },
+    { date: "2025-06-26", value: 78854 },
+    { date: "2025-06-27", value: 79340 },
+    { date: "2025-06-28", value: 79340 },
+    { date: "2025-06-29", value: 79340 },
+    { date: "2025-06-30", value: 79462 }
   ],
   gold: [
     { date: "2019-01-01", value: 13302 },
@@ -8190,171 +8231,187 @@ const embeddedData = {
     { date: "2024-12-29", value: 38097 },
     { date: "2024-12-30", value: 37740 },
     { date: "2024-12-31", value: 38057 },
-    { date: "2025-01-01", value: 37982 },
-    { date: "2025-01-02", value: 38666 },
-    { date: "2025-01-03", value: 38291 },
-    { date: "2025-01-04", value: 38291 },
-    { date: "2025-01-05", value: 38291 },
-    { date: "2025-01-06", value: 38322 },
-    { date: "2025-01-07", value: 38653 },
-    { date: "2025-01-08", value: 38927 },
-    { date: "2025-01-09", value: 38875 },
-    { date: "2025-01-10", value: 39159 },
-    { date: "2025-01-11", value: 39159 },
-    { date: "2025-01-12", value: 39159 },
-    { date: "2025-01-13", value: 38690 },
-    { date: "2025-01-14", value: 39019 },
-    { date: "2025-01-15", value: 38939 },
-    { date: "2025-01-16", value: 38865 },
-    { date: "2025-01-17", value: 38958 },
-    { date: "2025-01-18", value: 38958 },
-    { date: "2025-01-19", value: 38958 },
-    { date: "2025-01-20", value: 38781 },
-    { date: "2025-01-21", value: 39356 },
-    { date: "2025-01-22", value: 39820 },
-    { date: "2025-01-23", value: 39643 },
-    { date: "2025-01-24", value: 39873 },
-    { date: "2025-01-25", value: 39873 },
-    { date: "2025-01-26", value: 39873 },
-    { date: "2025-01-27", value: 39086 },
-    { date: "2025-01-28", value: 39672 },
-    { date: "2025-01-29", value: 39460 },
-    { date: "2025-01-30", value: 39812 },
-    { date: "2025-01-31", value: 40128 },
-    { date: "2025-02-01", value: 40128 },
-    { date: "2025-02-02", value: 40128 },
-    { date: "2025-02-03", value: 40216 },
-    { date: "2025-02-04", value: 40512 },
-    { date: "2025-02-05", value: 40309 },
-    { date: "2025-02-06", value: 39898 },
-    { date: "2025-02-07", value: 39957 },
-    { date: "2025-02-08", value: 39957 },
-    { date: "2025-02-09", value: 39957 },
-    { date: "2025-02-10", value: 40785 },
-    { date: "2025-02-11", value: 40762 },
-    { date: "2025-02-12", value: 41339 },
-    { date: "2025-02-13", value: 41290 },
-    { date: "2025-02-14", value: 40558 },
-    { date: "2025-02-15", value: 40558 },
-    { date: "2025-02-16", value: 40558 },
-    { date: "2025-02-17", value: 40337 },
-    { date: "2025-02-18", value: 41156 },
-    { date: "2025-02-19", value: 41026 },
-    { date: "2025-02-20", value: 40544 },
-    { date: "2025-02-21", value: 40425 },
-    { date: "2025-02-22", value: 40425 },
-    { date: "2025-02-23", value: 40425 },
-    { date: "2025-02-24", value: 40751 },
-    { date: "2025-02-25", value: 40034 },
-    { date: "2025-02-26", value: 40108 },
-    { date: "2025-02-27", value: 39690 },
-    { date: "2025-02-28", value: 39664 },
-    { date: "2025-03-01", value: 39664 },
-    { date: "2025-03-02", value: 39664 },
-    { date: "2025-03-03", value: 39871 },
-    { date: "2025-03-04", value: 40308 },
+    { date: "2025-01-01", value: 38105 },
+    { date: "2025-01-02", value: 38698 },
+    { date: "2025-01-03", value: 38310 },
+    { date: "2025-01-04", value: 38310 },
+    { date: "2025-01-05", value: 38310 },
+    { date: "2025-01-06", value: 38334 },
+    { date: "2025-01-07", value: 38619 },
+    { date: "2025-01-08", value: 38934 },
+    { date: "2025-01-09", value: 38934 },
+    { date: "2025-01-10", value: 39196 },
+    { date: "2025-01-11", value: 39196 },
+    { date: "2025-01-12", value: 39196 },
+    { date: "2025-01-13", value: 38736 },
+    { date: "2025-01-14", value: 39031 },
+    { date: "2025-01-15", value: 38946 },
+    { date: "2025-01-16", value: 38895 },
+    { date: "2025-01-17", value: 38925 },
+    { date: "2025-01-18", value: 38925 },
+    { date: "2025-01-19", value: 38925 },
+    { date: "2025-01-20", value: 38925 },
+    { date: "2025-01-21", value: 39366 },
+    { date: "2025-01-22", value: 39829 },
+    { date: "2025-01-23", value: 39630 },
+    { date: "2025-01-24", value: 39857 },
+    { date: "2025-01-25", value: 39857 },
+    { date: "2025-01-26", value: 39857 },
+    { date: "2025-01-27", value: 39111 },
+    { date: "2025-01-28", value: 39674 },
+    { date: "2025-01-29", value: 39502 },
+    { date: "2025-01-30", value: 39806 },
+    { date: "2025-01-31", value: 40106 },
+    { date: "2025-02-01", value: 40106 },
+    { date: "2025-02-02", value: 40106 },
+    { date: "2025-02-03", value: 40207 },
+    { date: "2025-02-04", value: 40495 },
+    { date: "2025-02-05", value: 40335 },
+    { date: "2025-02-06", value: 39921 },
+    { date: "2025-02-07", value: 39933 },
+    { date: "2025-02-08", value: 39933 },
+    { date: "2025-02-09", value: 39933 },
+    { date: "2025-02-10", value: 40776 },
+    { date: "2025-02-11", value: 40786 },
+    { date: "2025-02-12", value: 41346 },
+    { date: "2025-02-13", value: 41279 },
+    { date: "2025-02-14", value: 40560 },
+    { date: "2025-02-15", value: 40560 },
+    { date: "2025-02-16", value: 40560 },
+    { date: "2025-02-17", value: 40560 },
+    { date: "2025-02-18", value: 41150 },
+    { date: "2025-02-19", value: 41028 },
+    { date: "2025-02-20", value: 40551 },
+    { date: "2025-02-21", value: 40384 },
+    { date: "2025-02-22", value: 40384 },
+    { date: "2025-02-23", value: 40384 },
+    { date: "2025-02-24", value: 40756 },
+    { date: "2025-02-25", value: 40018 },
+    { date: "2025-02-26", value: 40095 },
+    { date: "2025-02-27", value: 39663 },
+    { date: "2025-02-28", value: 39642 },
+    { date: "2025-03-01", value: 39642 },
+    { date: "2025-03-02", value: 39642 },
+    { date: "2025-03-03", value: 39852 },
+    { date: "2025-03-04", value: 40119 },
     { date: "2025-03-05", value: 40137 },
-    { date: "2025-03-06", value: 39684 },
-    { date: "2025-03-07", value: 39721 },
-    { date: "2025-03-08", value: 39721 },
-    { date: "2025-03-09", value: 39721 },
-    { date: "2025-03-10", value: 39179 },
-    { date: "2025-03-11", value: 39774 },
-    { date: "2025-03-12", value: 40078 },
-    { date: "2025-03-13", value: 40659 },
-    { date: "2025-03-14", value: 40908 },
-    { date: "2025-03-15", value: 40908 },
-    { date: "2025-03-16", value: 40908 },
-    { date: "2025-03-17", value: 41289 },
-    { date: "2025-03-18", value: 41784 },
-    { date: "2025-03-19", value: 41795 },
-    { date: "2025-03-20", value: 41766 },
-    { date: "2025-03-21", value: 41583 },
-    { date: "2025-03-22", value: 41583 },
-    { date: "2025-03-23", value: 41583 },
-    { date: "2025-03-24", value: 41773 },
-    { date: "2025-03-25", value: 41741 },
+    { date: "2025-03-06", value: 39649 },
+    { date: "2025-03-07", value: 39710 },
+    { date: "2025-03-08", value: 39710 },
+    { date: "2025-03-09", value: 39710 },
+    { date: "2025-03-10", value: 39186 },
+    { date: "2025-03-11", value: 39773 },
+    { date: "2025-03-12", value: 40107 },
+    { date: "2025-03-13", value: 40631 },
+    { date: "2025-03-14", value: 40915 },
+    { date: "2025-03-15", value: 40915 },
+    { date: "2025-03-16", value: 40915 },
+    { date: "2025-03-17", value: 41275 },
+    { date: "2025-03-18", value: 41795 },
+    { date: "2025-03-19", value: 41846 },
+    { date: "2025-03-20", value: 41768 },
+    { date: "2025-03-21", value: 41593 },
+    { date: "2025-03-22", value: 41593 },
+    { date: "2025-03-23", value: 41593 },
+    { date: "2025-03-24", value: 41761 },
+    { date: "2025-03-25", value: 41732 },
     { date: "2025-03-26", value: 41891 },
-    { date: "2025-03-27", value: 42587 },
-    { date: "2025-03-28", value: 42560 },
-    { date: "2025-03-29", value: 42560 },
-    { date: "2025-03-30", value: 42560 },
-    { date: "2025-03-31", value: 43211 },
-    { date: "2025-04-01", value: 43028 },
-    { date: "2025-04-02", value: 42994 },
-    { date: "2025-04-03", value: 41845 },
-    { date: "2025-04-04", value: 41119 },
-    { date: "2025-04-05", value: 41119 },
-    { date: "2025-04-06", value: 41119 },
-    { date: "2025-04-07", value: 40496 },
-    { date: "2025-04-08", value: 40262 },
-    { date: "2025-04-09", value: 42148 },
-    { date: "2025-04-10", value: 42227 },
-    { date: "2025-04-11", value: 42754 },
-    { date: "2025-04-12", value: 42754 },
-    { date: "2025-04-13", value: 42754 },
-    { date: "2025-04-14", value: 42355 },
-    { date: "2025-04-15", value: 42654 },
-    { date: "2025-04-16", value: 43610 },
+    { date: "2025-03-27", value: 42586 },
+    { date: "2025-03-28", value: 42551 },
+    { date: "2025-03-29", value: 42551 },
+    { date: "2025-03-30", value: 42551 },
+    { date: "2025-03-31", value: 43210 },
+    { date: "2025-04-01", value: 43033 },
+    { date: "2025-04-02", value: 43230 },
+    { date: "2025-04-03", value: 41899 },
+    { date: "2025-04-04", value: 41104 },
+    { date: "2025-04-05", value: 41104 },
+    { date: "2025-04-06", value: 41104 },
+    { date: "2025-04-07", value: 40540 },
+    { date: "2025-04-08", value: 40273 },
+    { date: "2025-04-09", value: 42216 },
+    { date: "2025-04-10", value: 42300 },
+    { date: "2025-04-11", value: 42783 },
+    { date: "2025-04-12", value: 42783 },
+    { date: "2025-04-13", value: 42783 },
+    { date: "2025-04-14", value: 42369 },
+    { date: "2025-04-15", value: 42650 },
+    { date: "2025-04-16", value: 43695 },
     { date: "2025-04-17", value: 43590 },
-    { date: "2025-04-18", value: 43517 },
-    { date: "2025-04-19", value: 43517 },
-    { date: "2025-04-20", value: 43517 },
-    { date: "2025-04-21", value: 44452 },
-    { date: "2025-04-22", value: 44048 },
-    { date: "2025-04-23", value: 43560 },
-    { date: "2025-04-24", value: 43947 },
-    { date: "2025-04-25", value: 43778 },
-    { date: "2025-04-26", value: 43778 },
-    { date: "2025-04-27", value: 43778 },
-    { date: "2025-04-28", value: 43884 },
-    { date: "2025-04-29", value: 43576 },
-    { date: "2025-04-30", value: 43453 },
-    { date: "2025-05-01", value: 43263 },
-    { date: "2025-05-02", value: 43191 },
-    { date: "2025-05-03", value: 43191 },
-    { date: "2025-05-04", value: 43191 },
-    { date: "2025-05-05", value: 44102 },
-    { date: "2025-05-06", value: 44939 },
-    { date: "2025-05-07", value: 44700 },
-    { date: "2025-05-08", value: 44455 },
-    { date: "2025-05-09", value: 44604 },
-    { date: "2025-05-10", value: 44604 },
-    { date: "2025-05-11", value: 44604 },
-    { date: "2025-05-12", value: 44268 },
-    { date: "2025-05-13", value: 44172 },
-    { date: "2025-05-14", value: 43029 },
-    { date: "2025-05-15", value: 43389 },
-    { date: "2025-05-16", value: 42850 },
-    { date: "2025-05-17", value: 42850 },
-    { date: "2025-05-18", value: 42850 },
+    { date: "2025-04-18", value: 43590 },
+    { date: "2025-04-19", value: 43590 },
+    { date: "2025-04-20", value: 43590 },
+    { date: "2025-04-21", value: 44461 },
+    { date: "2025-04-22", value: 44057 },
+    { date: "2025-04-23", value: 43547 },
+    { date: "2025-04-24", value: 43968 },
+    { date: "2025-04-25", value: 43766 },
+    { date: "2025-04-26", value: 43766 },
+    { date: "2025-04-27", value: 43766 },
+    { date: "2025-04-28", value: 43902 },
+    { date: "2025-04-29", value: 43564 },
+    { date: "2025-04-30", value: 43413 },
+    { date: "2025-05-01", value: 43292 },
+    { date: "2025-05-02", value: 43208 },
+    { date: "2025-05-03", value: 43208 },
+    { date: "2025-05-04", value: 43208 },
+    { date: "2025-05-05", value: 44120 },
+    { date: "2025-05-06", value: 44929 },
+    { date: "2025-05-07", value: 44703 },
+    { date: "2025-05-08", value: 44454 },
+    { date: "2025-05-09", value: 44588 },
+    { date: "2025-05-10", value: 44588 },
+    { date: "2025-05-11", value: 44588 },
+    { date: "2025-05-12", value: 44252 },
+    { date: "2025-05-13", value: 44162 },
+    { date: "2025-05-14", value: 43046 },
+    { date: "2025-05-15", value: 43376 },
+    { date: "2025-05-16", value: 42950 },
+    { date: "2025-05-17", value: 42950 },
+    { date: "2025-05-18", value: 42950 },
     { date: "2025-05-19", value: 43174 },
-    { date: "2025-05-20", value: 43875 },
-    { date: "2025-05-21", value: 43939 },
-    { date: "2025-05-22", value: 43651 },
-    { date: "2025-05-23", value: 44157 },
-    { date: "2025-05-24", value: 44157 },
-    { date: "2025-05-25", value: 44157 },
-    { date: "2025-05-26", value: 44244 },
+    { date: "2025-05-20", value: 43886 },
+    { date: "2025-05-21", value: 43941 },
+    { date: "2025-05-22", value: 43653 },
+    { date: "2025-05-23", value: 44142 },
+    { date: "2025-05-24", value: 44142 },
+    { date: "2025-05-25", value: 44142 },
+    { date: "2025-05-26", value: 44142 },
     { date: "2025-05-27", value: 43957 },
-    { date: "2025-05-28", value: 44004 },
-    { date: "2025-05-29", value: 44068 },
-    { date: "2025-05-30", value: 43740 },
-    { date: "2025-05-31", value: 43740 },
-    { date: "2025-06-01", value: 43740 },
+    { date: "2025-05-28", value: 44028 },
+    { date: "2025-05-29", value: 44049 },
+    { date: "2025-05-30", value: 43687 },
+    { date: "2025-05-31", value: 43687 },
+    { date: "2025-06-01", value: 43687 },
     { date: "2025-06-02", value: 44480 },
-    { date: "2025-06-03", value: 44490 },
-    { date: "2025-06-04", value: 44383 },
-    { date: "2025-06-05", value: 44396 },
-    { date: "2025-06-06", value: 44214 },
-    { date: "2025-06-07", value: 44214 },
-    { date: "2025-06-08", value: 44159 },
-    { date: "2025-06-09", value: 44336 },
-    { date: "2025-06-10", value: 44426 },
-    { date: "2025-06-11", value: 44574 },
-    { date: "2025-06-12", value: 44795 },
-    { date: "2025-06-13", value: 45575 },
-    { date: "2025-06-14", value: 45575 }
+    { date: "2025-06-03", value: 44511 },
+    { date: "2025-06-04", value: 44422 },
+    { date: "2025-06-05", value: 44442 },
+    { date: "2025-06-06", value: 44190 },
+    { date: "2025-06-07", value: 44190 },
+    { date: "2025-06-08", value: 44190 },
+    { date: "2025-06-09", value: 44323 },
+    { date: "2025-06-10", value: 44444 },
+    { date: "2025-06-11", value: 44601 },
+    { date: "2025-06-12", value: 44819 },
+    { date: "2025-06-13", value: 45527 },
+    { date: "2025-06-14", value: 45527 },
+    { date: "2025-06-15", value: 45527 },
+    { date: "2025-06-16", value: 45167 },
+    { date: "2025-06-17", value: 45307 },
+    { date: "2025-06-18", value: 45028 },
+    { date: "2025-06-19", value: 45028 },
+    { date: "2025-06-20", value: 45331 },
+    { date: "2025-06-21", value: 45331 },
+    { date: "2025-06-22", value: 45331 },
+    { date: "2025-06-23", value: 45463 },
+    { date: "2025-06-24", value: 44330 },
+    { date: "2025-06-25", value: 44615 },
+    { date: "2025-06-26", value: 44295 },
+    { date: "2025-06-27", value: 43608 },
+    { date: "2025-06-28", value: 43608 },
+    { date: "2025-06-29", value: 43608 },
+    { date: "2025-06-30", value: 43907 }
   ],
   bitcoin: [
     { date: "2024-01-11", value: 3869 },
@@ -8714,171 +8771,187 @@ const embeddedData = {
     { date: "2024-12-29", value: 8471 },
     { date: "2024-12-30", value: 8400 },
     { date: "2024-12-31", value: 8334 },
-    { date: "2025-01-01", value: 8318 },
-    { date: "2025-01-02", value: 8721 },
-    { date: "2025-01-03", value: 8802 },
-    { date: "2025-01-04", value: 8802 },
-    { date: "2025-01-05", value: 8802 },
-    { date: "2025-01-06", value: 9167 },
-    { date: "2025-01-07", value: 8667 },
-    { date: "2025-01-08", value: 8448 },
-    { date: "2025-01-09", value: 8437 },
-    { date: "2025-01-10", value: 8491 },
-    { date: "2025-01-11", value: 8491 },
-    { date: "2025-01-12", value: 8491 },
-    { date: "2025-01-13", value: 8379 },
-    { date: "2025-01-14", value: 8665 },
-    { date: "2025-01-15", value: 8862 },
-    { date: "2025-01-16", value: 8854 },
-    { date: "2025-01-17", value: 9323 },
-    { date: "2025-01-18", value: 9323 },
-    { date: "2025-01-19", value: 9323 },
-    { date: "2025-01-20", value: 9280 },
-    { date: "2025-01-21", value: 9397 },
-    { date: "2025-01-22", value: 9292 },
-    { date: "2025-01-23", value: 9173 },
-    { date: "2025-01-24", value: 9300 },
-    { date: "2025-01-25", value: 9300 },
-    { date: "2025-01-26", value: 9300 },
-    { date: "2025-01-27", value: 8912 },
+    { date: "2025-01-01", value: 8345 },
+    { date: "2025-01-02", value: 8728 },
+    { date: "2025-01-03", value: 8806 },
+    { date: "2025-01-04", value: 8806 },
+    { date: "2025-01-05", value: 8806 },
+    { date: "2025-01-06", value: 9170 },
+    { date: "2025-01-07", value: 8659 },
+    { date: "2025-01-08", value: 8449 },
+    { date: "2025-01-09", value: 8449 },
+    { date: "2025-01-10", value: 8498 },
+    { date: "2025-01-11", value: 8498 },
+    { date: "2025-01-12", value: 8498 },
+    { date: "2025-01-13", value: 8389 },
+    { date: "2025-01-14", value: 8667 },
+    { date: "2025-01-15", value: 8863 },
+    { date: "2025-01-16", value: 8861 },
+    { date: "2025-01-17", value: 9314 },
+    { date: "2025-01-18", value: 9314 },
+    { date: "2025-01-19", value: 9314 },
+    { date: "2025-01-20", value: 9314 },
+    { date: "2025-01-21", value: 9399 },
+    { date: "2025-01-22", value: 9293 },
+    { date: "2025-01-23", value: 9169 },
+    { date: "2025-01-24", value: 9295 },
+    { date: "2025-01-25", value: 9295 },
+    { date: "2025-01-26", value: 9295 },
+    { date: "2025-01-27", value: 8917 },
     { date: "2025-01-28", value: 8953 },
-    { date: "2025-01-29", value: 9207 },
-    { date: "2025-01-30", value: 9219 },
-    { date: "2025-01-31", value: 8959 },
-    { date: "2025-02-01", value: 8959 },
-    { date: "2025-02-02", value: 8959 },
-    { date: "2025-02-03", value: 8907 },
-    { date: "2025-02-04", value: 8661 },
-    { date: "2025-02-05", value: 8446 },
-    { date: "2025-02-06", value: 8348 },
-    { date: "2025-02-07", value: 8241 },
-    { date: "2025-02-08", value: 8241 },
-    { date: "2025-02-09", value: 8241 },
-    { date: "2025-02-10", value: 8415 },
-    { date: "2025-02-11", value: 8255 },
-    { date: "2025-02-12", value: 8515 },
-    { date: "2025-02-13", value: 8367 },
-    { date: "2025-02-14", value: 8431 },
-    { date: "2025-02-15", value: 8431 },
-    { date: "2025-02-16", value: 8431 },
-    { date: "2025-02-17", value: 8386 },
-    { date: "2025-02-18", value: 8135 },
+    { date: "2025-01-29", value: 9217 },
+    { date: "2025-01-30", value: 9218 },
+    { date: "2025-01-31", value: 8953 },
+    { date: "2025-02-01", value: 8953 },
+    { date: "2025-02-02", value: 8953 },
+    { date: "2025-02-03", value: 8905 },
+    { date: "2025-02-04", value: 8657 },
+    { date: "2025-02-05", value: 8451 },
+    { date: "2025-02-06", value: 8353 },
+    { date: "2025-02-07", value: 8235 },
+    { date: "2025-02-08", value: 8235 },
+    { date: "2025-02-09", value: 8235 },
+    { date: "2025-02-10", value: 8413 },
+    { date: "2025-02-11", value: 8260 },
+    { date: "2025-02-12", value: 8516 },
+    { date: "2025-02-13", value: 8365 },
+    { date: "2025-02-14", value: 8432 },
+    { date: "2025-02-15", value: 8432 },
+    { date: "2025-02-16", value: 8432 },
+    { date: "2025-02-17", value: 8432 },
+    { date: "2025-02-18", value: 8134 },
     { date: "2025-02-19", value: 8280 },
-    { date: "2025-02-20", value: 8383 },
-    { date: "2025-02-21", value: 8051 },
-    { date: "2025-02-22", value: 8051 },
-    { date: "2025-02-23", value: 8051 },
+    { date: "2025-02-20", value: 8384 },
+    { date: "2025-02-21", value: 8043 },
+    { date: "2025-02-22", value: 8043 },
+    { date: "2025-02-23", value: 8043 },
     { date: "2025-02-24", value: 7997 },
-    { date: "2025-02-25", value: 7454 },
-    { date: "2025-02-26", value: 7147 },
-    { date: "2025-02-27", value: 7093 },
-    { date: "2025-02-28", value: 7207 },
-    { date: "2025-03-01", value: 7207 },
-    { date: "2025-03-02", value: 7207 },
-    { date: "2025-03-03", value: 7310 },
-    { date: "2025-03-04", value: 7392 },
+    { date: "2025-02-25", value: 7450 },
+    { date: "2025-02-26", value: 7144 },
+    { date: "2025-02-27", value: 7088 },
+    { date: "2025-02-28", value: 7203 },
+    { date: "2025-03-01", value: 7203 },
+    { date: "2025-03-02", value: 7203 },
+    { date: "2025-03-03", value: 7306 },
+    { date: "2025-03-04", value: 7357 },
     { date: "2025-03-05", value: 7660 },
-    { date: "2025-03-06", value: 7491 },
-    { date: "2025-03-07", value: 7313 },
-    { date: "2025-03-08", value: 7313 },
-    { date: "2025-03-09", value: 7313 },
-    { date: "2025-03-10", value: 6612 },
-    { date: "2025-03-11", value: 6982 },
-    { date: "2025-03-12", value: 6992 },
-    { date: "2025-03-13", value: 6728 },
+    { date: "2025-03-06", value: 7484 },
+    { date: "2025-03-07", value: 7310 },
+    { date: "2025-03-08", value: 7310 },
+    { date: "2025-03-09", value: 7310 },
+    { date: "2025-03-10", value: 6613 },
+    { date: "2025-03-11", value: 6981 },
+    { date: "2025-03-12", value: 6996 },
+    { date: "2025-03-13", value: 6723 },
     { date: "2025-03-14", value: 7158 },
     { date: "2025-03-15", value: 7158 },
     { date: "2025-03-16", value: 7158 },
-    { date: "2025-03-17", value: 7173 },
-    { date: "2025-03-18", value: 6991 },
-    { date: "2025-03-19", value: 7229 },
+    { date: "2025-03-17", value: 7170 },
+    { date: "2025-03-18", value: 6992 },
+    { date: "2025-03-19", value: 7237 },
     { date: "2025-03-20", value: 7118 },
-    { date: "2025-03-21", value: 7125 },
-    { date: "2025-03-22", value: 7125 },
-    { date: "2025-03-23", value: 7125 },
-    { date: "2025-03-24", value: 7562 },
-    { date: "2025-03-25", value: 7512 },
-    { date: "2025-03-26", value: 7408 },
+    { date: "2025-03-21", value: 7126 },
+    { date: "2025-03-22", value: 7126 },
+    { date: "2025-03-23", value: 7126 },
+    { date: "2025-03-24", value: 7560 },
+    { date: "2025-03-25", value: 7510 },
+    { date: "2025-03-26", value: 7407 },
     { date: "2025-03-27", value: 7470 },
-    { date: "2025-03-28", value: 7126 },
-    { date: "2025-03-29", value: 7126 },
-    { date: "2025-03-30", value: 7126 },
+    { date: "2025-03-28", value: 7124 },
+    { date: "2025-03-29", value: 7124 },
+    { date: "2025-03-30", value: 7124 },
     { date: "2025-03-31", value: 7016 },
-    { date: "2025-04-01", value: 7228 },
-    { date: "2025-04-02", value: 7375 },
-    { date: "2025-04-03", value: 6801 },
-    { date: "2025-04-04", value: 7016 },
-    { date: "2025-04-05", value: 7016 },
-    { date: "2025-04-06", value: 7016 },
-    { date: "2025-04-07", value: 6549 },
-    { date: "2025-04-08", value: 6373 },
-    { date: "2025-04-09", value: 6912 },
-    { date: "2025-04-10", value: 6526 },
-    { date: "2025-04-11", value: 6842 },
-    { date: "2025-04-12", value: 6842 },
-    { date: "2025-04-13", value: 6842 },
-    { date: "2025-04-14", value: 6896 },
-    { date: "2025-04-15", value: 6840 },
-    { date: "2025-04-16", value: 6805 },
-    { date: "2025-04-17", value: 6875 },
-    { date: "2025-04-18", value: 6863 },
-    { date: "2025-04-19", value: 6863 },
-    { date: "2025-04-20", value: 6863 },
-    { date: "2025-04-21", value: 7005 },
-    { date: "2025-04-22", value: 7376 },
-    { date: "2025-04-23", value: 7633 },
-    { date: "2025-04-24", value: 7597 },
-    { date: "2025-04-25", value: 7799 },
-    { date: "2025-04-26", value: 7799 },
-    { date: "2025-04-27", value: 7799 },
-    { date: "2025-04-28", value: 7653 },
-    { date: "2025-04-29", value: 7719 },
-    { date: "2025-04-30", value: 7654 },
-    { date: "2025-05-01", value: 7985 },
-    { date: "2025-05-02", value: 7998 },
-    { date: "2025-05-03", value: 7998 },
-    { date: "2025-05-04", value: 7998 },
-    { date: "2025-05-05", value: 7705 },
-    { date: "2025-05-06", value: 7687 },
+    { date: "2025-04-01", value: 7229 },
+    { date: "2025-04-02", value: 7415 },
+    { date: "2025-04-03", value: 6810 },
+    { date: "2025-04-04", value: 7013 },
+    { date: "2025-04-05", value: 7013 },
+    { date: "2025-04-06", value: 7013 },
+    { date: "2025-04-07", value: 6556 },
+    { date: "2025-04-08", value: 6375 },
+    { date: "2025-04-09", value: 6923 },
+    { date: "2025-04-10", value: 6537 },
+    { date: "2025-04-11", value: 6846 },
+    { date: "2025-04-12", value: 6846 },
+    { date: "2025-04-13", value: 6846 },
+    { date: "2025-04-14", value: 6898 },
+    { date: "2025-04-15", value: 6839 },
+    { date: "2025-04-16", value: 6817 },
+    { date: "2025-04-17", value: 6874 },
+    { date: "2025-04-18", value: 6874 },
+    { date: "2025-04-19", value: 6874 },
+    { date: "2025-04-20", value: 6874 },
+    { date: "2025-04-21", value: 7006 },
+    { date: "2025-04-22", value: 7377 },
+    { date: "2025-04-23", value: 7630 },
+    { date: "2025-04-24", value: 7600 },
+    { date: "2025-04-25", value: 7796 },
+    { date: "2025-04-26", value: 7796 },
+    { date: "2025-04-27", value: 7796 },
+    { date: "2025-04-28", value: 7656 },
+    { date: "2025-04-29", value: 7716 },
+    { date: "2025-04-30", value: 7646 },
+    { date: "2025-05-01", value: 7990 },
+    { date: "2025-05-02", value: 8001 },
+    { date: "2025-05-03", value: 8001 },
+    { date: "2025-05-04", value: 8001 },
+    { date: "2025-05-05", value: 7708 },
+    { date: "2025-05-06", value: 7685 },
     { date: "2025-05-07", value: 7863 },
-    { date: "2025-05-08", value: 8406 },
-    { date: "2025-05-09", value: 8526 },
-    { date: "2025-05-10", value: 8526 },
-    { date: "2025-05-11", value: 8526 },
-    { date: "2025-05-12", value: 8592 },
-    { date: "2025-05-13", value: 8795 },
-    { date: "2025-05-14", value: 8620 },
-    { date: "2025-05-15", value: 8545 },
-    { date: "2025-05-16", value: 8623 },
-    { date: "2025-05-17", value: 8623 },
-    { date: "2025-05-18", value: 8623 },
+    { date: "2025-05-08", value: 8405 },
+    { date: "2025-05-09", value: 8523 },
+    { date: "2025-05-10", value: 8523 },
+    { date: "2025-05-11", value: 8523 },
+    { date: "2025-05-12", value: 8589 },
+    { date: "2025-05-13", value: 8793 },
+    { date: "2025-05-14", value: 8623 },
+    { date: "2025-05-15", value: 8542 },
+    { date: "2025-05-16", value: 8642 },
+    { date: "2025-05-17", value: 8642 },
+    { date: "2025-05-18", value: 8642 },
     { date: "2025-05-19", value: 8695 },
-    { date: "2025-05-20", value: 8805 },
+    { date: "2025-05-20", value: 8807 },
     { date: "2025-05-21", value: 8882 },
     { date: "2025-05-22", value: 9102 },
-    { date: "2025-05-23", value: 8815 },
-    { date: "2025-05-24", value: 8815 },
-    { date: "2025-05-25", value: 8815 },
-    { date: "2025-05-26", value: 8832 },
-    { date: "2025-05-27", value: 9024 },
-    { date: "2025-05-28", value: 8803 },
-    { date: "2025-05-29", value: 8649 },
-    { date: "2025-05-30", value: 8561 },
-    { date: "2025-05-31", value: 8561 },
-    { date: "2025-06-01", value: 8561 },
-    { date: "2025-06-02", value: 8473 },
-    { date: "2025-06-03", value: 8698 },
-    { date: "2025-06-04", value: 8514 },
-    { date: "2025-06-05", value: 8306 },
-    { date: "2025-06-06", value: 8586 },
-    { date: "2025-06-07", value: 8586 },
-    { date: "2025-06-08", value: 8575 },
-    { date: "2025-06-09", value: 8933 },
-    { date: "2025-06-10", value: 9025 },
-    { date: "2025-06-11", value: 8937 },
-    { date: "2025-06-12", value: 8711 },
-    { date: "2025-06-13", value: 8609 },
-    { date: "2025-06-14", value: 8609 }
+    { date: "2025-05-23", value: 8812 },
+    { date: "2025-05-24", value: 8812 },
+    { date: "2025-05-25", value: 8812 },
+    { date: "2025-05-26", value: 8812 },
+    { date: "2025-05-27", value: 9023 },
+    { date: "2025-05-28", value: 8808 },
+    { date: "2025-05-29", value: 8645 },
+    { date: "2025-05-30", value: 8551 },
+    { date: "2025-05-31", value: 8551 },
+    { date: "2025-06-01", value: 8551 },
+    { date: "2025-06-02", value: 8472 },
+    { date: "2025-06-03", value: 8702 },
+    { date: "2025-06-04", value: 8521 },
+    { date: "2025-06-05", value: 8314 },
+    { date: "2025-06-06", value: 8580 },
+    { date: "2025-06-07", value: 8580 },
+    { date: "2025-06-08", value: 8580 },
+    { date: "2025-06-09", value: 8930 },
+    { date: "2025-06-10", value: 9028 },
+    { date: "2025-06-11", value: 8942 },
+    { date: "2025-06-12", value: 8716 },
+    { date: "2025-06-13", value: 8599 },
+    { date: "2025-06-14", value: 8599 },
+    { date: "2025-06-15", value: 8599 },
+    { date: "2025-06-16", value: 8955 },
+    { date: "2025-06-17", value: 8642 },
+    { date: "2025-06-18", value: 8559 },
+    { date: "2025-06-19", value: 8559 },
+    { date: "2025-06-20", value: 8580 },
+    { date: "2025-06-21", value: 8580 },
+    { date: "2025-06-22", value: 8580 },
+    { date: "2025-06-23", value: 8576 },
+    { date: "2025-06-24", value: 8698 },
+    { date: "2025-06-25", value: 8902 },
+    { date: "2025-06-26", value: 8828 },
+    { date: "2025-06-27", value: 8787 },
+    { date: "2025-06-28", value: 8787 },
+    { date: "2025-06-29", value: 8787 },
+    { date: "2025-06-30", value: 8818 }
   ],
 };
 
@@ -9031,39 +9104,53 @@ const embeddedData = {
 
             const filteredData = [];
             let counter = 0;
-            for (let i = fullData.length - 1; i >= 0; i--) {
+            
+            // 開始日より前の最新のデータポイントを探す
+            let lastDataBeforeStart = null;
+            for (let i = 0; i < fullData.length; i++) {
+                if (fullData[i].date >= startDate) {
+                    break;
+                }
+                lastDataBeforeStart = fullData[i];
+            }
+            
+            // 開始日のデータポイントを追加（実データがない場合は前の値を使用）
+            if (lastDataBeforeStart) {
+                filteredData.push({
+                    date: new Date(startDate),
+                    value: lastDataBeforeStart.value
+                });
+            }
+            
+            // 期間内のデータをフィルタリング
+            for (let i = 0; i < fullData.length; i++) {
                 const item = fullData[i];
                 // currentDateより未来のデータは除外
                 if (item.date > today) {
                     continue;
                 }
-                if (item.date >= startDate) {
+                if (item.date >= startDate && item.date <= today) {
                     if (counter % step === 0 || period === '1M' || period === '3M') { // 1M, 3Mは間引かない
-                         // フィルタリングされたデータを *古い順* に追加していく
-                         filteredData.unshift(item);
+                         filteredData.push(item);
                     }
                     counter++;
-                } else {
-                    // startDateより前のデータになったらループを抜ける（データは日付順と仮定）
-                    // 最後のデータだけは必ず含める（開始点として）
-                    if (filteredData.length === 0 && i >= 0) {
-                        filteredData.unshift(fullData[i]);
-                    }
-                    break;
                 }
             }
-             // 最初のデータがstartDateより少し前の場合があるので、フィルタリング
-             const finalData = filteredData.filter(d => d.date >= startDate);
-             // 期間の開始点がない場合は、フィルタリング前の最初の点を追加
-             if (finalData.length > 0 && finalData[0].date > startDate && filteredData.length > 0) {
-                 const firstPointOriginal = filteredData.find(d => d.date < finalData[0].date);
-                 if(firstPointOriginal) finalData.unshift(firstPointOriginal);
-             } else if (finalData.length === 0 && filteredData.length > 0) {
-                 // フィルター後データがない場合（期間内にデータがない）、元の最後の点を追加
-                 finalData.push(filteredData[filteredData.length - 1]);
-             }
+            
+            // データがない場合の処理
+            if (filteredData.length === 0 && lastDataBeforeStart) {
+                // 期間内にデータがない場合、開始日と終了日に同じ値を設定
+                filteredData.push({
+                    date: new Date(startDate),
+                    value: lastDataBeforeStart.value
+                });
+                filteredData.push({
+                    date: new Date(today),
+                    value: lastDataBeforeStart.value
+                });
+            }
 
-            return finalData;
+            return filteredData;
         }
 
 
@@ -9139,9 +9226,7 @@ const embeddedData = {
                         },
                         y: {
                             title: {
-                                display: true,
-                                text: '価格 (pt)',
-                                font: { size: 12 }
+                                display: false // タイトルを非表示に
                             },
                             beginAtZero: false, // Y軸を0から始めない
                             grid: {
@@ -9150,12 +9235,9 @@ const embeddedData = {
                             },
                              ticks: {
                                 font: { size: 10 },
-                                // Y軸の値をよしなにフォーマット (例: 10000 -> 10k)
+                                // Y軸の値を数値のみで表示
                                 callback: function(value, index, values) {
-                                     if (value >= 1000) {
-                                        return (value / 1000).toFixed(1) + 'k';
-                                     }
-                                     return value;
+                                     return value.toLocaleString();
                                  }
                             }
                         }
@@ -9184,6 +9266,19 @@ const embeddedData = {
                                     }
                                     return label;
                                 }
+                            }
+                        },
+                        // カスタムプラグイン: 左上に単位を表示
+                        customUnitLabel: {
+                            afterDraw: function(chart) {
+                                const ctx = chart.ctx;
+                                ctx.save();
+                                ctx.font = '12px Arial, sans-serif';
+                                ctx.fillStyle = '#666';
+                                ctx.textAlign = 'left';
+                                ctx.textBaseline = 'top';
+                                ctx.fillText('(pt)', chart.chartArea.left + 5, chart.chartArea.top - 20);
+                                ctx.restore();
                             }
                         }
                     },
@@ -9333,25 +9428,25 @@ const embeddedData = {
                 if (currentCourseId && courseDetails[currentCourseId]) {
                     const details = courseDetails[currentCourseId];
                     const holding = userHoldings[currentCourseId] || { invested: 0, units: 0 };
-
+                    
                     // 現在の保有ポイントを計算
                     let currentHoldingPoints = 0;
                     if (holding.invested > 0 && allCourseData[currentCourseId]) {
                         const currentPrice = getCurrentPrice(currentCourseId);
                         currentHoldingPoints = Math.round(holding.units * currentPrice);
                     }
-
+                    
                     withdrawPointsInput.dataset.maxWithdraw = currentHoldingPoints;
                     withdrawCurrentPoints.innerHTML = `${currentHoldingPoints.toLocaleString()}<span class="points-small">pt</span>`;
                     withdrawCourseName.textContent = details.name;
                     withdrawCourseIcon.className = `course-icon ${details.iconClass}`;
                     withdrawCourseIcon.textContent = details.iconText;
-
+                    
                     updateAvailablePointsDisplay();
                     withdrawPointsInput.value = "0";
                     updateWithdrawButtonsState();
                     validateWithdrawButton();
-
+                    
                     const backToWithdrawBtn = document.getElementById('backToDetailFromWithdraw');
                     backToWithdrawBtn.setAttribute('onclick', `showScreen('${currentCourseId}DetailScreen')`);
                 }
@@ -9361,6 +9456,7 @@ const embeddedData = {
                 updateAvailablePointsDisplay();
                 updateUserHoldingsDisplay();
                 updateCurrentDateDisplay();
+                updateInvestmentSummary(); // 総ポイントグラフ更新のために呼び出し
             }
              // 詳細画面が表示される際の処理
              else if (screenId.endsWith('DetailScreen')) {
@@ -9396,11 +9492,7 @@ const embeddedData = {
                 activeContent.style.display = 'block';
             }
 
-            // PayPayポイント運用タブが選択されたらQRコードを生成
-            if (contentId === 'paypayLinkContent' && !ppPointQR.src) {
-                const deeplink = 'paypay://miniapp?appId=m_214669354616520704';
-                ppPointQR.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(deeplink)}`;
-            }
+            // PayPayポイント運用タブが選択されても、QRコードは既にbase64で埋め込まれているため何もしない
         }
 
         // ポイント追加処理関数 (クイック追加用)
@@ -9460,7 +9552,7 @@ const embeddedData = {
                     `;
                 }
             });
-
+            
             // 投資状況サマリーも更新
             updateInvestmentSummary();
         }
@@ -9469,14 +9561,14 @@ const embeddedData = {
         function getCurrentPrice(courseId) {
             const courseData = allCourseData[courseId];
             if (!courseData || courseData.length === 0) return 10000;
-
+            
             // currentDate以前の最新データを探す
             for (let i = courseData.length - 1; i >= 0; i--) {
                 if (courseData[i].date <= currentDate) {
                     return courseData[i].value;
                 }
             }
-
+            
             // 見つからない場合は最初のデータを返す
             return courseData[0].value;
         }
@@ -9490,11 +9582,11 @@ const embeddedData = {
         function updateCurrentDateDisplay() {
             document.getElementById('currentDateText').textContent = formatDate(currentDate);
             document.getElementById('currentDateInOperation').textContent = formatDate(currentDate);
-
+            
             const maxDate = new Date(loginDate);
             maxDate.setFullYear(loginDate.getFullYear() + 1);
             document.getElementById('maxDateInOperation').textContent = formatDate(maxDate);
-
+            
             // 運用ボタンの有効/無効を更新
             updateAdvanceTimeButtons();
         }
@@ -9503,12 +9595,12 @@ const embeddedData = {
         function updateAdvanceTimeButtons() {
             const maxDate = new Date(loginDate);
             maxDate.setFullYear(loginDate.getFullYear() + 1);
-
+            
             document.querySelectorAll('.advance-time-btn').forEach(btn => {
                 const months = parseInt(btn.dataset.months);
                 const futureDate = new Date(currentDate);
                 futureDate.setMonth(futureDate.getMonth() + months);
-
+                
                 if (futureDate > maxDate) {
                     btn.disabled = true;
                     btn.style.opacity = '0.5';
@@ -9524,7 +9616,7 @@ const embeddedData = {
         // --- 運用履歴を追加する関数 ---
         function addTransactionHistory(type, courseId, points, date = null) {
             const transactionDate = date || new Date(currentDate);
-
+            
             // 同じ日の取引回数をカウント
             const sameDayTransactions = transactionHistory.filter(t => {
                 const tDate = new Date(t.date);
@@ -9533,7 +9625,7 @@ const embeddedData = {
                        tDate.getDate() === transactionDate.getDate();
             });
             const dailyTransactionNumber = sameDayTransactions.length + 1;
-
+            
             const transaction = {
                 date: transactionDate,
                 type: type, // 'add' or 'withdraw'
@@ -9550,23 +9642,23 @@ const embeddedData = {
         function updateHistoryDisplay() {
             const historyList = document.getElementById('historyList');
             const emptyHistory = document.getElementById('emptyHistory');
-
+            
             if (transactionHistory.length === 0) {
                 historyList.innerHTML = '';
                 emptyHistory.style.display = 'block';
                 return;
             }
-
+            
             emptyHistory.style.display = 'none';
-
+            
             // 新しい順に表示
             const sortedHistory = [...transactionHistory].reverse();
-
+            
             historyList.innerHTML = sortedHistory.map(transaction => {
                 const typeText = transaction.type === 'add' ? '追加' : '引き出し';
                 const typeColor = transaction.type === 'add' ? '#4CAF50' : '#FF4B4B';
                 const typeIcon = transaction.type === 'add' ? '+' : '-';
-
+                
                 return `
                     <div style="border-bottom: 1px solid #eee; padding: 15px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -9593,7 +9685,7 @@ const embeddedData = {
         function updateInvestmentSummary() {
             let totalInvested = 0;
             let totalValue = 0;
-
+            
             Object.keys(userHoldings).forEach(courseId => {
                 const holding = userHoldings[courseId];
                 if (holding.invested > 0) {
@@ -9602,35 +9694,88 @@ const embeddedData = {
                     totalValue += Math.round(holding.units * currentPrice);
                 }
             });
-
+            
             const totalProfit = totalValue - totalInvested;
             const profitSign = totalProfit >= 0 ? '+' : '';
             const profitColor = totalProfit >= 0 ? '#90EE90' : '#FFB6C1';
-
+            
             document.getElementById('totalInvested').textContent = totalInvested.toLocaleString() + 'pt';
             document.getElementById('totalValue').textContent = totalValue.toLocaleString() + 'pt';
             const totalProfitElement = document.getElementById('totalProfit');
             totalProfitElement.textContent = profitSign + totalProfit.toLocaleString() + 'pt';
             totalProfitElement.style.color = profitColor;
+
+            // 総ポイント履歴を計算（売買タイミングを考慮）
+            totalPointsHistory = [];
+            const startDate = new Date(loginDate);
+            let tempDate = new Date(startDate);
+
+            // 各コースの保有単位数を追跡するための一時的なオブジェクト
+            let tempHoldings = {};
+            Object.keys(courseDetails).forEach(courseId => {
+                tempHoldings[courseId] = { units: 0 };
+            });
+
+            while (tempDate <= currentDate) {
+                // その日付での取引を反映
+                const dayTransactions = transactionHistory.filter(t => {
+                    const tDate = new Date(t.date);
+                    return tDate.getFullYear() === tempDate.getFullYear() &&
+                           tDate.getMonth() === tempDate.getMonth() &&
+                           tDate.getDate() === tempDate.getDate();
+                });
+
+                // 取引を順番に処理
+                dayTransactions.forEach(transaction => {
+                    const courseId = transaction.courseId;
+                    const priceAtDate = getCurrentPriceAtDate(courseId, tempDate);
+                    
+                    if (transaction.type === 'add') {
+                        // 追加の場合、単位数を増やす
+                        const unitsAdded = transaction.points / priceAtDate;
+                        tempHoldings[courseId].units += unitsAdded;
+                    } else if (transaction.type === 'withdraw') {
+                        // 引き出しの場合、単位数を減らす
+                        const unitsWithdrawn = transaction.points / priceAtDate;
+                        tempHoldings[courseId].units -= unitsWithdrawn;
+                        if (tempHoldings[courseId].units < 0.0001) {
+                            tempHoldings[courseId].units = 0;
+                        }
+                    }
+                });
+
+                // その日の総評価額を計算
+                let dailyTotalValue = 0;
+                Object.keys(tempHoldings).forEach(courseId => {
+                    if (tempHoldings[courseId].units > 0) {
+                        const priceAtDate = getCurrentPriceAtDate(courseId, tempDate);
+                        dailyTotalValue += Math.round(tempHoldings[courseId].units * priceAtDate);
+                    }
+                });
+
+                totalPointsHistory.push({ date: new Date(tempDate), value: dailyTotalValue });
+                tempDate.setDate(tempDate.getDate() + 1); // 次の日に進む
+            }
+            updateTotalPointsChart();
         }
 
         // --- コース詳細画面の保有状況を更新する関数 ---
         function updateCourseHoldingStatus(courseId) {
             const holding = userHoldings[courseId] || { invested: 0, units: 0 };
             const currentPrice = getCurrentPrice(courseId);
-
+            
             // 現在価格の表示
             const priceElement = document.getElementById(`${courseId}CurrentPrice`);
             if (priceElement) {
                 priceElement.textContent = `現在価格: ${Math.round(currentPrice).toLocaleString()}pt`;
             }
-
+            
             // 投資額の表示
             const investedElement = document.getElementById(`${courseId}Invested`);
             if (investedElement) {
                 investedElement.textContent = holding.invested.toLocaleString() + 'pt';
             }
-
+            
             // 評価額の表示
             let currentValue = 0;
             if (holding.invested > 0) {
@@ -9640,7 +9785,7 @@ const embeddedData = {
             if (valueElement) {
                 valueElement.textContent = currentValue.toLocaleString() + 'pt';
             }
-
+            
             // 累計損益の表示
             const profit = currentValue - holding.invested;
             const profitElement = document.getElementById(`${courseId}Profit`);
@@ -9661,7 +9806,7 @@ const embeddedData = {
                     if (detailScreen) {
                         const screenId = detailScreen.id;
                         const courseId = screenId.replace('DetailScreen', '');
-
+                        
                         if (courseId && courseDetails[courseId]) {
                             currentCourseId = courseId;
                             showScreen('withdrawScreen');
@@ -9732,7 +9877,8 @@ const embeddedData = {
             updateUserHoldingsDisplay();
             updateCurrentDateDisplay();
             updateHistoryDisplay();
-            updateInvestmentSummary(); // 追加
+            updateInvestmentSummary();
+            updateTotalPointsChart(); // 総ポイントグラフを初期化時に描画
             console.log('=== initializeSimulator 完了 ===');
         }
 
@@ -9884,7 +10030,7 @@ const embeddedData = {
                 if (currentPrice > 0) {
                     const unitsToWithdraw = pointsWithdrawn / currentPrice;
                     userHoldings[currentCourseId].units -= unitsToWithdraw;
-
+                    
                     // unitsがほぼ0になったら、invested（元本）も0にリセット
                     if (userHoldings[currentCourseId].units < 0.0001) {
                         userHoldings[currentCourseId].units = 0;
@@ -9960,16 +10106,16 @@ const embeddedData = {
             button.addEventListener('click', function() {
                 const months = parseInt(this.dataset.months);
                 const monthsText = months === 12 ? '1年' : `${months}ヶ月`;
-
+                
                 // 確認ダイアログを表示
                 const message = `本当に${monthsText}先まで時間を進めますか？\n\n` +
                                `注意: 時間を進めると元に戻すことはできません。\n` +
                                `各コースの価格が変動し、損益が発生する可能性があります。`;
-
+                
                 if (confirm(message)) {
                     // ローディング画面を表示
                     showLoadingOverlay(months);
-
+                    
                     // 5秒後に実際の処理を実行
                     setTimeout(() => {
                         advanceTime(months);
@@ -9997,12 +10143,12 @@ const embeddedData = {
             const overlay = document.getElementById('loadingOverlay');
             const periodText = document.getElementById('loadingPeriod');
             const progressBar = document.getElementById('loadingProgressBar');
-
+            
             const monthsText = months === 12 ? '1年' : `${months}ヶ月`;
             periodText.textContent = `${monthsText}後へ移動中`;
-
+            
             overlay.classList.add('active');
-
+            
             // プログレスバーのアニメーション
             let progress = 0;
             const interval = setInterval(() => {
@@ -10013,12 +10159,12 @@ const embeddedData = {
                 }
             }, 100); // 5秒で100%になるように調整（50ms * 100 = 5000ms）
         }
-
+        
         // --- ローディング画面を非表示にする関数 ---
         function hideLoadingOverlay() {
             const overlay = document.getElementById('loadingOverlay');
             const progressBar = document.getElementById('loadingProgressBar');
-
+            
             overlay.classList.remove('active');
             // プログレスバーをリセット
             setTimeout(() => {
@@ -10030,27 +10176,27 @@ const embeddedData = {
         function advanceTime(months) {
             const maxDate = new Date(loginDate);
             maxDate.setFullYear(loginDate.getFullYear() + 1);
-
+            
             const newDate = new Date(currentDate);
             newDate.setMonth(newDate.getMonth() + months);
-
+            
             if (newDate > maxDate) {
                 alert('最大運用期間（1年）を超えることはできません。');
                 return;
             }
-
+            
             const oldDate = new Date(currentDate);
             currentDate = newDate;
-
+            
             const resultDiv = document.getElementById('operationResult');
             const detailsDiv = document.getElementById('operationDetails');
-
+            
             let totalInvested = 0;
             let totalValueBefore = 0;
             let totalValueAfter = 0;
             let details = `<p><strong>運用期間: ${formatDate(oldDate)} → ${formatDate(currentDate)}</strong></p>`;
             details += '<div style="margin-top: 15px;">';
-
+            
             // 各コースの計算
             Object.keys(userHoldings).forEach(courseId => {
                 const holding = userHoldings[courseId];
@@ -10058,20 +10204,20 @@ const embeddedData = {
                     // 時間進行前の価格で評価額を計算
                     const priceBefore = getCurrentPriceAtDate(courseId, oldDate);
                     const valueBefore = Math.round(holding.units * priceBefore);
-
+                    
                     // 時間進行後の価格で評価額を計算
                     const priceAfter = getCurrentPrice(courseId);
                     const valueAfter = Math.round(holding.units * priceAfter);
-
+                    
                     totalInvested += holding.invested;
                     totalValueBefore += valueBefore;
                     totalValueAfter += valueAfter;
-
+                    
                     const periodProfit = valueAfter - valueBefore;
                     const periodProfitRate = ((valueAfter / valueBefore - 1) * 100).toFixed(1);
                     const totalProfit = valueAfter - holding.invested;
                     const totalProfitRate = ((valueAfter / holding.invested - 1) * 100).toFixed(1);
-
+                    
                     details += `
                         <div style="margin-bottom: 15px; padding: 10px; background: white; border-radius: 5px;">
                             <strong>${courseDetails[courseId].name}</strong><br>
@@ -10087,7 +10233,7 @@ const embeddedData = {
                     `;
                 }
             });
-
+            
             if (totalInvested === 0) {
                 details = '<p style="color: #777;">運用中のポイントがありません。<br>まず各コースにポイントを追加してください。</p>';
                 currentDate = oldDate; // 時間を戻す
@@ -10096,7 +10242,7 @@ const embeddedData = {
                 const periodProfitRate = totalValueBefore > 0 ? ((totalValueAfter / totalValueBefore - 1) * 100).toFixed(1) : '0.0';
                 const totalProfit = totalValueAfter - totalInvested;
                 const totalProfitRate = ((totalValueAfter / totalInvested - 1) * 100).toFixed(1);
-
+                
                 details += `
                     </div>
                     <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #ddd;">
@@ -10112,12 +10258,12 @@ const embeddedData = {
                         </span>
                     </div>
                 `;
-
+                
                 // 画面を更新
                 updateCurrentDateDisplay();
                 updateUserHoldingsDisplay();
                 updateInvestmentSummary(); // 追加
-
+                
                 // 現在表示中の詳細画面のグラフを更新
                 const activeDetailScreen = document.querySelector('.screen.active[id$="DetailScreen"]');
                 if (activeDetailScreen) {
@@ -10146,6 +10292,137 @@ const embeddedData = {
             
             return courseData[0].value;
         }
+
+        // --- 全保有ポイントの推移グラフを更新する関数 ---
+        function updateTotalPointsChart() {
+            const ctx = document.getElementById('totalPointsChart').getContext('2d');
+            if (chartInstances.totalPointsChart) {
+                chartInstances.totalPointsChart.destroy();
+            }
+
+            // 追加したポイントの累計を計算
+            const addedPointsHistory = [];
+            const startDate = new Date(loginDate);
+            let tempDate = new Date(startDate);
+            
+            // 現在保有している全コースの投資額の合計を計算
+            let currentTotalInvested = 0;
+            Object.keys(userHoldings).forEach(courseId => {
+                currentTotalInvested += userHoldings[courseId].invested;
+            });
+            
+            while (tempDate <= currentDate) {
+                // その日付までの投資総額を計算
+                // 基本は現在の投資総額
+                let cumulativeInvested = currentTotalInvested;
+                
+                // 現在日付より後の取引を逆算して、その日時点での投資額を計算
+                const futureTransactions = transactionHistory.filter(t => {
+                    const tDate = new Date(t.date);
+                    return tDate > tempDate && tDate <= currentDate;
+                });
+                
+                // 将来の取引を逆算
+                futureTransactions.forEach(transaction => {
+                    if (transaction.type === 'add') {
+                        cumulativeInvested -= transaction.points;
+                    } else if (transaction.type === 'withdraw') {
+                        cumulativeInvested += transaction.points;
+                    }
+                });
+
+                addedPointsHistory.push({ date: new Date(tempDate), value: cumulativeInvested });
+                tempDate.setDate(tempDate.getDate() + 1);
+            }
+
+            chartInstances.totalPointsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: totalPointsHistory.map(item => item.date),
+                    datasets: [{
+                        label: '運用ポイント',
+                        data: totalPointsHistory.map(item => item.value),
+                        borderColor: '#4285F4',
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        pointHoverRadius: 3,
+                        tension: 0.1,
+                        fill: false
+                    }, {
+                        label: '追加したポイント',
+                        data: addedPointsHistory.map(item => item.value),
+                        borderColor: '#999999',
+                        borderDash: [5, 5],
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        pointHoverRadius: 3,
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'month',
+                                tooltipFormat: 'yyyy/MM/dd',
+                                displayFormats: {
+                                    month: 'yyyy/MM'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: '日付'
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: false // タイトルを非表示に
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                boxWidth: 20,
+                                boxHeight: 1,
+                                padding: 10
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + 'pt';
+                                }
+                            }
+                        },
+                        // カスタムプラグイン: 左上に単位を表示
+                        customUnitLabel: {
+                            afterDraw: function(chart) {
+                                const ctx = chart.ctx;
+                                ctx.save();
+                                ctx.font = '12px Arial, sans-serif';
+                                ctx.fillStyle = '#666';
+                                ctx.textAlign = 'left';
+                                ctx.textBaseline = 'top';
+                                ctx.fillText('(pt)', chart.chartArea.left + 5, chart.chartArea.top - 20);
+                                ctx.restore();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
 
         document.addEventListener('DOMContentLoaded', function() {
              // 初期状態ではログイン画面を表示
