@@ -29,15 +29,22 @@
         .header {
             background: #4285F4;
             color: white;
-            padding: 15px;
+            padding: 0;
             display: flex;
             align-items: center;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            max-width: 400px;
+            z-index: 1000;
             border-top-left-radius: 10px; /* 角丸を追加 */
             border-top-right-radius: 10px; /* 角丸を追加 */
         }
         .header h1 {
             margin: 0;
+            padding: 15px 0;
             font-size: 18px;
             flex-grow: 1;
             text-align: center;
@@ -49,13 +56,14 @@
             border: none;
             cursor: pointer;
             position: absolute; /* 絶対位置指定 */
-            left: 15px; /* 左からの位置 */
+            left: 0;
+            padding: 15px;
         }
         .header-buttons { /* ヘッダー右側のボタン用コンテナ */
             display: flex;
             align-items: center;
             position: absolute; /* 絶対位置指定 */
-            right: 15px; /* 右からの位置 */
+            right: 0;
         }
         .help-button, .close-button {
             color: white;
@@ -63,12 +71,14 @@
             background: none;
             border: none;
             cursor: pointer;
-            margin-left: 10px; /* ボタン間のマージン */
+            margin-left: 0;
+            padding: 15px;
         }
         .content {
             padding: 15px;
             overflow-y: auto;
             flex-grow: 1;
+            margin-top: 70px; /* ヘッダー(60px) + タブ(10px) の最小限のマージンに調整 */
         }
         .screen {
             display: none;
@@ -267,11 +277,22 @@
             display: flex;
             border-bottom: 1px solid #ddd;
             margin-bottom: 15px;
+            position: fixed;
+            top: 60px; /* ヘッダーの高さ分下に配置 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            max-width: 400px;
+            background: white;
+            z-index: 999;
+            padding: 0;
         }
         .tab {
-            padding: 10px 15px; /* padding調整 */
+            padding: 8px 15px; /* paddingを少し縮小 */
             cursor: pointer;
             font-size: 14px; /* タブの文字サイズ調整 */
+            flex: 1;
+            text-align: center;
         }
         .tab.active {
             border-bottom: 2px solid #4285F4;
@@ -381,6 +402,7 @@
              border-top-right-radius: 10px;
              border-bottom-left-radius: 0;
              border-bottom-right-radius: 0;
+             position: relative; /* ログイン画面のヘッダーは固定化しない */
         }
          #loginScreen .header h1 {
              text-align: center;
@@ -392,6 +414,7 @@
             flex-direction: column;
             justify-content: center;
             flex-grow: 1;
+            margin-top: 0; /* ログイン画面はマージンなし */
         }
         .login-input {
             width: 100%;
@@ -420,6 +443,10 @@
             margin-top: 15px;
             text-align: center;
             min-height: 20px;
+        }
+        /* --- ログイン画面専用スタイル --- */
+        #loginScreen .content {
+            margin-top: 0; /* ログイン画面はマージンなし */
         }
         /* --- ここまでログイン画面用スタイル --- */
 
@@ -545,6 +572,34 @@
             animation: dots 1.5s infinite;
         }
 
+        /* --- レスポンシブデザイン対応 --- */
+        @media (max-width: 480px) {
+            .header {
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .header h1 {
+                font-size: 16px;
+                padding: 10px 0;
+            }
+            .back-button {
+                padding: 10px;
+            }
+            .help-button, .close-button {
+                padding: 10px;
+            }
+            .tabs {
+                top: 50px;
+                padding: 0;
+                width: 100%;
+                max-width: 100%;
+            }
+            .content {
+                margin-top: 60px;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -565,7 +620,7 @@
             <div style="font-size: 12px; color: #999;">少々お待ちください</div>
         </div>
     </div>
-    
+
     <div class="container">
 
         <div id="loginScreen" class="screen active">
@@ -618,9 +673,9 @@
                         <canvas id="totalPointsChart"></canvas>
                     </div>
 
-                    
 
-                    
+
+
 
                     <!-- 投資状況サマリー -->
                     <div id="investmentSummary" style="background: linear-gradient(135deg, #4285F4 0%, #6aa3ff 100%); color: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
@@ -698,7 +753,7 @@
 
                 <div id="historyContent" class="tab-content" style="display: none;">
                     <div style="padding: 15px 0;">
-                        <div id="historyList" style="max-height: 400px; overflow-y: auto;">
+                        <div id="historyList" style="overflow-y: visible;">
                             <!-- 履歴項目がここに追加される -->
                         </div>
                         <div id="emptyHistory" style="padding: 40px; text-align: center; color: #777;">
@@ -727,7 +782,7 @@
                             最大で<strong id="maxDateInOperation">2025年6月30日</strong>まで運用可能です
                         </p>
                     </div>
-                    
+
                     <div id="advanceTimeButtons" style="display: flex; flex-direction: column; gap: 15px;">
                         <button class="button advance-time-btn" data-months="1" style="background: #9E9E9E; color: white; padding: 15px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">
                             1ヶ月運用する
@@ -742,7 +797,7 @@
                             1年運用する
                         </button>
                     </div>
-                    
+
                     <div id="operationResult" style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px; display: none;">
                         <h4 style="color: #333; margin-bottom: 15px;">運用結果</h4>
                         <div id="operationDetails" style="color: #555;"></div>
@@ -787,7 +842,7 @@
                     <button class="time-filter active" data-period="1Y">1年</button>
                     <button class="time-filter" data-period="5Y">5年</button>
                 </div>
-                
+
                 <!-- 保有状況セクション -->
                 <div id="goldHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -809,7 +864,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="course-description">
                     <p><strong>連動するETF:</strong>SPDRゴールド・シェア（GLD）</p>
                     <p><strong>コース概要:</strong>金で運用するETFの価格に連動するコースです。株価の下落時に影響を受けにくいため、株式で構成されるコースのリスク回避を行いたい方に向いています。</p>
@@ -842,7 +897,7 @@
                      <button class="time-filter active" data-period="1Y">1年</button>
                      <button class="time-filter" data-period="5Y">5年</button>
                  </div>
-                
+
                 <!-- 保有状況セクション -->
                 <div id="standardHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -864,7 +919,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="course-description">
                     <p><strong>連動するETF:</strong>SPDR S&P500 ETF（SPY）</p>
                     <p><strong>コース概要:</strong>アメリカを代表する企業500社に分散して運用するコースです。500銘柄への分散投資で個別銘柄よりも大きな変動は少ないため、長期運用に向いています。</p>
@@ -897,7 +952,7 @@
                      <button class="time-filter active" data-period="1Y">1年</button>
                      <button class="time-filter" data-period="5Y">5年</button>
                  </div>
-                
+
                 <!-- 保有状況セクション -->
                 <div id="techHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -919,7 +974,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                  <div class="course-description">
                     <p><strong>連動するETF:</strong>インべスコQQQ（QQQ）</p>
                     <p><strong>コース概要:</strong>アメリカのナスダック市場に上場する企業の中で代表的な100社に分散して運用するコースです。アメリカを代表するテクノロジー企業に投資をしたい方に向いています。</p>
@@ -952,7 +1007,7 @@
                      <button class="time-filter active" data-period="1Y">1年</button>
                      <button class="time-filter" data-period="5Y">5年</button>
                  </div>
-                
+
                 <!-- 保有状況セクション -->
                 <div id="bitcoinHoldingStatus" style="background: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; border: 1px solid #e9ecef;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -974,7 +1029,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="course-description">
                     <p><strong>連動対象（想定）:</strong> ビットコイン価格</p>
                     <p><strong>コース概要:</strong>代表的な暗号資産（仮想通貨）であるビットコインの価格変動に連動することを目指すコースです。ビットコインは価格変動が非常に大きいことで知られています。</p>
@@ -9104,7 +9159,7 @@ const embeddedData = {
 
             const filteredData = [];
             let counter = 0;
-            
+
             // 開始日より前の最新のデータポイントを探す
             let lastDataBeforeStart = null;
             for (let i = 0; i < fullData.length; i++) {
@@ -9113,7 +9168,7 @@ const embeddedData = {
                 }
                 lastDataBeforeStart = fullData[i];
             }
-            
+
             // 開始日のデータポイントを追加（実データがない場合は前の値を使用）
             if (lastDataBeforeStart) {
                 filteredData.push({
@@ -9121,7 +9176,7 @@ const embeddedData = {
                     value: lastDataBeforeStart.value
                 });
             }
-            
+
             // 期間内のデータをフィルタリング
             for (let i = 0; i < fullData.length; i++) {
                 const item = fullData[i];
@@ -9136,7 +9191,7 @@ const embeddedData = {
                     counter++;
                 }
             }
-            
+
             // データがない場合の処理
             if (filteredData.length === 0 && lastDataBeforeStart) {
                 // 期間内にデータがない場合、開始日と終了日に同じ値を設定
@@ -9428,25 +9483,25 @@ const embeddedData = {
                 if (currentCourseId && courseDetails[currentCourseId]) {
                     const details = courseDetails[currentCourseId];
                     const holding = userHoldings[currentCourseId] || { invested: 0, units: 0 };
-                    
+
                     // 現在の保有ポイントを計算
                     let currentHoldingPoints = 0;
                     if (holding.invested > 0 && allCourseData[currentCourseId]) {
                         const currentPrice = getCurrentPrice(currentCourseId);
                         currentHoldingPoints = Math.round(holding.units * currentPrice);
                     }
-                    
+
                     withdrawPointsInput.dataset.maxWithdraw = currentHoldingPoints;
                     withdrawCurrentPoints.innerHTML = `${currentHoldingPoints.toLocaleString()}<span class="points-small">pt</span>`;
                     withdrawCourseName.textContent = details.name;
                     withdrawCourseIcon.className = `course-icon ${details.iconClass}`;
                     withdrawCourseIcon.textContent = details.iconText;
-                    
+
                     updateAvailablePointsDisplay();
                     withdrawPointsInput.value = "0";
                     updateWithdrawButtonsState();
                     validateWithdrawButton();
-                    
+
                     const backToWithdrawBtn = document.getElementById('backToDetailFromWithdraw');
                     backToWithdrawBtn.setAttribute('onclick', `showScreen('${currentCourseId}DetailScreen')`);
                 }
@@ -9552,7 +9607,7 @@ const embeddedData = {
                     `;
                 }
             });
-            
+
             // 投資状況サマリーも更新
             updateInvestmentSummary();
         }
@@ -9561,14 +9616,14 @@ const embeddedData = {
         function getCurrentPrice(courseId) {
             const courseData = allCourseData[courseId];
             if (!courseData || courseData.length === 0) return 10000;
-            
+
             // currentDate以前の最新データを探す
             for (let i = courseData.length - 1; i >= 0; i--) {
                 if (courseData[i].date <= currentDate) {
                     return courseData[i].value;
                 }
             }
-            
+
             // 見つからない場合は最初のデータを返す
             return courseData[0].value;
         }
@@ -9582,11 +9637,11 @@ const embeddedData = {
         function updateCurrentDateDisplay() {
             document.getElementById('currentDateText').textContent = formatDate(currentDate);
             document.getElementById('currentDateInOperation').textContent = formatDate(currentDate);
-            
+
             const maxDate = new Date(loginDate);
             maxDate.setFullYear(loginDate.getFullYear() + 1);
             document.getElementById('maxDateInOperation').textContent = formatDate(maxDate);
-            
+
             // 運用ボタンの有効/無効を更新
             updateAdvanceTimeButtons();
         }
@@ -9595,12 +9650,12 @@ const embeddedData = {
         function updateAdvanceTimeButtons() {
             const maxDate = new Date(loginDate);
             maxDate.setFullYear(loginDate.getFullYear() + 1);
-            
+
             document.querySelectorAll('.advance-time-btn').forEach(btn => {
                 const months = parseInt(btn.dataset.months);
                 const futureDate = new Date(currentDate);
                 futureDate.setMonth(futureDate.getMonth() + months);
-                
+
                 if (futureDate > maxDate) {
                     btn.disabled = true;
                     btn.style.opacity = '0.5';
@@ -9616,7 +9671,7 @@ const embeddedData = {
         // --- 運用履歴を追加する関数 ---
         function addTransactionHistory(type, courseId, points, date = null) {
             const transactionDate = date || new Date(currentDate);
-            
+
             // 同じ日の取引回数をカウント
             const sameDayTransactions = transactionHistory.filter(t => {
                 const tDate = new Date(t.date);
@@ -9625,7 +9680,7 @@ const embeddedData = {
                        tDate.getDate() === transactionDate.getDate();
             });
             const dailyTransactionNumber = sameDayTransactions.length + 1;
-            
+
             const transaction = {
                 date: transactionDate,
                 type: type, // 'add' or 'withdraw'
@@ -9642,23 +9697,23 @@ const embeddedData = {
         function updateHistoryDisplay() {
             const historyList = document.getElementById('historyList');
             const emptyHistory = document.getElementById('emptyHistory');
-            
+
             if (transactionHistory.length === 0) {
                 historyList.innerHTML = '';
                 emptyHistory.style.display = 'block';
                 return;
             }
-            
+
             emptyHistory.style.display = 'none';
-            
+
             // 新しい順に表示
             const sortedHistory = [...transactionHistory].reverse();
-            
+
             historyList.innerHTML = sortedHistory.map(transaction => {
                 const typeText = transaction.type === 'add' ? '追加' : '引き出し';
                 const typeColor = transaction.type === 'add' ? '#4CAF50' : '#FF4B4B';
                 const typeIcon = transaction.type === 'add' ? '+' : '-';
-                
+
                 return `
                     <div style="border-bottom: 1px solid #eee; padding: 15px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -9685,7 +9740,7 @@ const embeddedData = {
         function updateInvestmentSummary() {
             let totalInvested = 0;
             let totalValue = 0;
-            
+
             Object.keys(userHoldings).forEach(courseId => {
                 const holding = userHoldings[courseId];
                 if (holding.invested > 0) {
@@ -9694,11 +9749,11 @@ const embeddedData = {
                     totalValue += Math.round(holding.units * currentPrice);
                 }
             });
-            
+
             const totalProfit = totalValue - totalInvested;
             const profitSign = totalProfit >= 0 ? '+' : '';
             const profitColor = totalProfit >= 0 ? '#90EE90' : '#FFB6C1';
-            
+
             document.getElementById('totalInvested').textContent = totalInvested.toLocaleString() + 'pt';
             document.getElementById('totalValue').textContent = totalValue.toLocaleString() + 'pt';
             const totalProfitElement = document.getElementById('totalProfit');
@@ -9729,7 +9784,7 @@ const embeddedData = {
                 dayTransactions.forEach(transaction => {
                     const courseId = transaction.courseId;
                     const priceAtDate = getCurrentPriceAtDate(courseId, tempDate);
-                    
+
                     if (transaction.type === 'add') {
                         // 追加の場合、単位数を増やす
                         const unitsAdded = transaction.points / priceAtDate;
@@ -9763,19 +9818,19 @@ const embeddedData = {
         function updateCourseHoldingStatus(courseId) {
             const holding = userHoldings[courseId] || { invested: 0, units: 0 };
             const currentPrice = getCurrentPrice(courseId);
-            
+
             // 現在価格の表示
             const priceElement = document.getElementById(`${courseId}CurrentPrice`);
             if (priceElement) {
                 priceElement.textContent = `現在価格: ${Math.round(currentPrice).toLocaleString()}pt`;
             }
-            
+
             // 投資額の表示
             const investedElement = document.getElementById(`${courseId}Invested`);
             if (investedElement) {
                 investedElement.textContent = holding.invested.toLocaleString() + 'pt';
             }
-            
+
             // 評価額の表示
             let currentValue = 0;
             if (holding.invested > 0) {
@@ -9785,7 +9840,7 @@ const embeddedData = {
             if (valueElement) {
                 valueElement.textContent = currentValue.toLocaleString() + 'pt';
             }
-            
+
             // 累計損益の表示
             const profit = currentValue - holding.invested;
             const profitElement = document.getElementById(`${courseId}Profit`);
@@ -9806,7 +9861,7 @@ const embeddedData = {
                     if (detailScreen) {
                         const screenId = detailScreen.id;
                         const courseId = screenId.replace('DetailScreen', '');
-                        
+
                         if (courseId && courseDetails[courseId]) {
                             currentCourseId = courseId;
                             showScreen('withdrawScreen');
@@ -9852,6 +9907,12 @@ const embeddedData = {
             Object.keys(courseDetails).forEach(id => {
                 userHoldings[id] = { invested: 0, units: 0 };
             });
+
+            // 運用結果を非表示にする
+            const operationResult = document.getElementById('operationResult');
+            if (operationResult) {
+                operationResult.style.display = 'none';
+            }
 
              // チャートインスタンスを破棄
             Object.values(chartInstances).forEach(chart => chart.destroy());
@@ -10030,7 +10091,7 @@ const embeddedData = {
                 if (currentPrice > 0) {
                     const unitsToWithdraw = pointsWithdrawn / currentPrice;
                     userHoldings[currentCourseId].units -= unitsToWithdraw;
-                    
+
                     // unitsがほぼ0になったら、invested（元本）も0にリセット
                     if (userHoldings[currentCourseId].units < 0.0001) {
                         userHoldings[currentCourseId].units = 0;
@@ -10080,6 +10141,11 @@ const embeddedData = {
                     passwordInput.value = '';
                     loginError.textContent = '';
                     currentCourseId = null;
+                    // 運用結果を非表示にする
+                    const operationResult = document.getElementById('operationResult');
+                    if (operationResult) {
+                        operationResult.style.display = 'none';
+                    }
                     // 状態をリセット
                     initializeSimulator();
                     // ログイン画面に戻る
